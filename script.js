@@ -24,24 +24,39 @@ class VoiceTodoApp {
     }
 
     setupVoiceRecognition() {
-        // Use browser's built-in speech recognition (Speechmatics integration can be added later)
+        // Use browser's built-in speech recognition with improved error handling
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             this.recognition = new SpeechRecognition();
             
+            // Configure recognition settings
             this.recognition.continuous = false;
             this.recognition.interimResults = false;
             this.recognition.lang = 'en-US';
+            this.recognition.maxAlternatives = 1;
+            
+            // Add timeout to prevent hanging
+            this.recognition.timeout = 10000; // 10 seconds
             
             this.recognition.onstart = () => {
                 this.isListening = true;
                 this.updateVoiceUI();
                 this.showNotification('Listening... Speak now!', 'info');
+                
+                // Add timeout fallback
+                setTimeout(() => {
+                    if (this.isListening) {
+                        this.recognition.stop();
+                        this.showNotification('Listening timeout. Please try again.', 'warning');
+                    }
+                }, 15000); // 15 second timeout
             };
             
             this.recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript.toLowerCase();
-                this.processVoiceCommand(transcript);
+                if (event.results && event.results.length > 0) {
+                    const transcript = event.results[0][0].transcript.toLowerCase();
+                    this.processVoiceCommand(transcript);
+                }
             };
             
             this.recognition.onerror = (event) => {
@@ -50,24 +65,53 @@ class VoiceTodoApp {
                 this.updateVoiceUI();
                 
                 let errorMessage = 'Voice recognition error. Please try again.';
-                if (event.error === 'network') {
-                    errorMessage = 'HTTPS required for voice recognition. Please use the HTTPS URL or enable insecure origins in Chrome flags.';
-                } else if (event.error === 'not-allowed') {
-                    errorMessage = 'Microphone access denied. Please allow microphone access and try again.';
-                } else if (event.error === 'no-speech') {
-                    errorMessage = 'No speech detected. Please speak clearly and try again.';
-                } else if (event.error === 'audio-capture') {
-                    errorMessage = 'No microphone found. Please connect a microphone and try again.';
-                } else if (event.error === 'service-not-allowed') {
-                    errorMessage = 'Voice recognition service not available. Please try again later.';
+                let errorType = 'error';
+                
+                switch(event.error) {
+                    case 'network':
+                        errorMessage = 'Network error. Please check your internet connection and try again.';
+                        errorType = 'warning';
+                        break;
+                    case 'not-allowed':
+                        errorMessage = 'Microphone access denied. Please allow microphone access and try again.';
+                        break;
+                    case 'no-speech':
+                        errorMessage = 'No speech detected. Please speak clearly and try again.';
+                        errorType = 'warning';
+                        break;
+                    case 'audio-capture':
+                        errorMessage = 'No microphone found. Please connect a microphone and try again.';
+                        break;
+                    case 'service-not-allowed':
+                        errorMessage = 'Voice recognition service not available. Please try again later.';
+                        errorType = 'warning';
+                        break;
+                    case 'aborted':
+                        errorMessage = 'Voice recognition was aborted. Please try again.';
+                        errorType = 'warning';
+                        break;
+                    case 'bad-grammar':
+                        errorMessage = 'Speech recognition grammar error. Please try again.';
+                        errorType = 'warning';
+                        break;
+                    case 'language-not-supported':
+                        errorMessage = 'Language not supported. Please try again.';
+                        break;
+                    default:
+                        errorMessage = `Voice recognition error: ${event.error}. Please try again.`;
+                        errorType = 'warning';
                 }
                 
-                this.showNotification(errorMessage, 'error');
+                this.showNotification(errorMessage, errorType);
                 
-                // Provide helpful instructions for network error
+                // Provide helpful instructions for specific errors
                 if (event.error === 'network') {
                     setTimeout(() => {
-                        this.showNotification('💡 Tip: Use HTTPS URL or enable chrome://flags/#unsafely-treat-insecure-origin-as-secure', 'info');
+                        this.showNotification('💡 Tip: Try refreshing the page or check your internet connection', 'info');
+                    }, 3000);
+                } else if (event.error === 'not-allowed') {
+                    setTimeout(() => {
+                        this.showNotification('💡 Tip: Click the microphone icon in your browser address bar to allow access', 'info');
                     }, 3000);
                 }
             };
@@ -76,9 +120,44 @@ class VoiceTodoApp {
                 this.isListening = false;
                 this.updateVoiceUI();
             };
+            
+            // Test recognition availability
+            this.testRecognitionAvailability();
         } else {
-            this.showNotification('Voice recognition not supported in this browser.', 'error');
+            this.showNotification('Voice recognition not supported in this browser. Please use Chrome, Edge, or Firefox.', 'error');
             document.getElementById('voiceBtn').disabled = true;
+        }
+    }
+    
+    testRecognitionAvailability() {
+        // Test if recognition is actually working
+        try {
+            const testRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            testRecognition.lang = 'en-US';
+            testRecognition.continuous = false;
+            testRecognition.interimResults = false;
+            
+            testRecognition.onerror = (event) => {
+                if (event.error === 'network' || event.error === 'service-not-allowed') {
+                    this.showNotification('Voice recognition service may be unavailable. Please try again later.', 'warning');
+                }
+            };
+            
+            testRecognition.onend = () => {
+                // Recognition is available
+            };
+            
+            // Start and immediately stop to test
+            testRecognition.start();
+            setTimeout(() => {
+                try {
+                    testRecognition.stop();
+                } catch (e) {
+                    // Ignore errors during test
+                }
+            }, 100);
+        } catch (e) {
+            console.warn('Speech recognition test failed:', e);
         }
     }
 
@@ -127,12 +206,36 @@ class VoiceTodoApp {
     }
 
     toggleVoiceRecognition() {
-        if (!this.recognition) return;
+        if (!this.recognition) {
+            this.showNotification('Voice recognition not available. Please refresh the page.', 'error');
+            return;
+        }
         
         if (this.isListening) {
-            this.recognition.stop();
+            try {
+                this.recognition.stop();
+            } catch (e) {
+                console.warn('Error stopping recognition:', e);
+                this.isListening = false;
+                this.updateVoiceUI();
+            }
         } else {
-            this.recognition.start();
+            try {
+                // Check if we're on HTTPS or localhost
+                const isSecure = window.location.protocol === 'https:' || 
+                                window.location.hostname === 'localhost' || 
+                                window.location.hostname === '127.0.0.1';
+                
+                if (!isSecure) {
+                    this.showNotification('Voice recognition requires HTTPS. Please use the HTTPS URL.', 'warning');
+                    return;
+                }
+                
+                this.recognition.start();
+            } catch (e) {
+                console.error('Error starting recognition:', e);
+                this.showNotification('Failed to start voice recognition. Please try again.', 'error');
+            }
         }
     }
 
