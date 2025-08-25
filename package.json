@@ -9,6 +9,7 @@
     "dev": "npx http-server -p 8000 --cors",
     "deploy": "echo 'Deploy to GitHub Pages: git push origin main'",
     "build": "echo 'No build step required - static files only'",
+    "vercel-build": "echo 'Vercel build completed'",
     "test": "echo 'No tests specified'",
     "lint": "echo 'No linting configured'"
   },

@@ -445,7 +445,7 @@ class VoiceTodoApp {
     }
 
     async speak(text) {
-        const API_KEY = 'GtUI2oA88OgDfaRIhHIf5RGu09mhcuAs';
+        const API_KEY = process.env.ELEVENLABS_API_KEY || 'GtUI2oA88OgDfaRIhHIf5RGu09mhcuAs';
         
         try {
             // Use ElevenLabs API for premium text-to-speech
