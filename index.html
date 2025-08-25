@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Todo - Smart Task Management</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎤</text></svg>">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <i class="fas fa-microphone-alt"></i>
+                    Voice Todo
+                </h1>
+                <p class="app-subtitle">Manage tasks with your voice</p>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Voice Control Section -->
+            <section class="voice-section">
+                <div class="voice-controls">
+                    <button id="voiceBtn" class="voice-btn">
+                        <i class="fas fa-microphone"></i>
+                        <span>Tap to speak</span>
+                    </button>
+                    <div class="voice-status">
+                        <div id="voiceStatus" class="status-text">Ready to listen</div>
+                        <div id="voiceIndicator" class="voice-indicator"></div>
+                    </div>
+                    <div class="connection-status">
+                        <div id="connectionStatus" class="status-badge">
+                            <i class="fas fa-info-circle"></i>
+                            <span>HTTP Mode - Enable HTTPS for voice</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="voice-commands">
+                    <h3>Voice Commands</h3>
+                    <div class="commands-grid">
+                        <div class="command-item">
+                            <span class="command">"Add task"</span>
+                            <span class="description">Add a new todo</span>
+                        </div>
+                        <div class="command-item">
+                            <span class="command">"Complete task"</span>
+                            <span class="description">Mark as done</span>
+                        </div>
+                        <div class="command-item">
+                            <span class="command">"Delete task"</span>
+                            <span class="description">Remove todo</span>
+                        </div>
+                        <div class="command-item">
+                            <span class="command">"Clear all"</span>
+                            <span class="description">Delete all todos</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="voice-settings">
+                    <h3>Voice Settings</h3>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label for="voiceVolume">Volume</label>
+                            <input type="range" id="voiceVolume" min="0" max="1" step="0.1" value="0.8">
+                            <span class="setting-value">80%</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="voiceSpeed">Speed</label>
+                            <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1">
+                            <span class="setting-value">1x</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Manual Input Section -->
+            <section class="input-section">
+                <div class="input-container">
+                    <input 
+                        type="text" 
+                        id="todoInput" 
+                        class="todo-input" 
+                        placeholder="Type a new task or use voice commands..."
+                        maxlength="100"
+                    >
+                    <button id="addBtn" class="add-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Todo List Section -->
+            <section class="todo-section">
+                <div class="todo-header">
+                    <h2>Your Tasks</h2>
+                    <div class="todo-stats">
+                        <span id="totalTasks">0</span> total
+                        <span id="completedTasks">0</span> completed
+                    </div>
+                </div>
+                
+                <div class="todo-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                </div>
+
+                <div class="todo-list" id="todoList">
+                    <!-- Todos will be dynamically added here -->
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No tasks yet</h3>
+                    <p>Add your first task using voice commands or typing</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Notification -->
+        <div id="notification" class="notification">
+            <i class="notification-icon"></i>
+            <span class="notification-text"></span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

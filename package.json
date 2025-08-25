@@ -1,0 +1,48 @@
+{
+  "name": "voice-controlled-todo-list",
+  "version": "1.0.0",
+  "description": "A modern, voice-controlled todo application with premium features, beautiful dark UI, and seamless voice interaction.",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx http-server -p 8000 -S -C-1",
+    "dev": "npx http-server -p 8000 --cors",
+    "deploy": "echo 'Deploy to GitHub Pages: git push origin main'",
+    "build": "echo 'No build step required - static files only'",
+    "test": "echo 'No tests specified'",
+    "lint": "echo 'No linting configured'"
+  },
+  "keywords": [
+    "voice-control",
+    "todo-list",
+    "speech-recognition",
+    "text-to-speech",
+    "elevenlabs",
+    "web-speech-api",
+    "vanilla-javascript",
+    "responsive-design",
+    "dark-theme",
+    "productivity"
+  ],
+  "author": "Unsaid-afk",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Unsaid-afk/voice-controlled-todo-list.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Unsaid-afk/voice-controlled-todo-list/issues"
+  },
+  "homepage": "https://unsaid-afk.github.io/voice-controlled-todo-list",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
