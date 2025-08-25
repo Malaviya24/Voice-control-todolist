@@ -33,8 +33,5 @@
         }
       ]
     }
-  ],
-  "env": {
-    "SPEECHMATICS_API_KEY": "@speechmatics_api_key"
-  }
+  ]
 }
