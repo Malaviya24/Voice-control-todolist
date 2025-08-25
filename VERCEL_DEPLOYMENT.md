@@ -6,7 +6,7 @@ This guide will help you deploy your Voice-Controlled Todo List to Vercel with p
 
 - [Vercel Account](https://vercel.com/signup)
 - [GitHub Account](https://github.com)
-- [ElevenLabs API Key](https://elevenlabs.io/)
+- [Speechmatics API Key](https://www.speechmatics.com/) (or use your existing API key)
 
 ## 🎯 Step-by-Step Deployment
 
@@ -40,8 +40,8 @@ This guide will help you deploy your Voice-Controlled Todo List to Vercel with p
    - Click "Environment Variables"
    - Add the following:
      ```
-     Name: ELEVENLABS_API_KEY
-     Value: your_actual_api_key_here
+     Name: SPEECHMATICS_API_KEY
+     Value: GtUI2oA88OgDfaRIhHIf5RGu09mhcuAs
      Environment: Production, Preview, Development
      ```
 
@@ -68,7 +68,7 @@ This guide will help you deploy your Voice-Controlled Todo List to Vercel with p
 
 4. **Set Environment Variables**:
    ```bash
-   vercel env add ELEVENLABS_API_KEY
+   vercel env add SPEECHMATICS_API_KEY
    ```
 
 ### **Step 3: Configure Environment Variables**
@@ -81,13 +81,13 @@ This guide will help you deploy your Voice-Controlled Todo List to Vercel with p
 
 | Name | Value | Environment |
 |------|-------|-------------|
-| `ELEVENLABS_API_KEY` | `your_actual_api_key` | Production, Preview, Development |
+| `SPEECHMATICS_API_KEY` | `GtUI2oA88OgDfaRIhHIf5RGu09mhcuAs` | Production, Preview, Development |
 
 #### **Using Vercel CLI**:
 
 ```bash
 # Add environment variable
-vercel env add ELEVENLABS_API_KEY
+vercel env add SPEECHMATICS_API_KEY
 
 # List environment variables
 vercel env ls
@@ -96,11 +96,11 @@ vercel env ls
 vercel env pull .env.local
 ```
 
-### **Step 4: Get Your ElevenLabs API Key**
+### **Step 4: Get Your Speechmatics API Key**
 
-1. **Go to [ElevenLabs](https://elevenlabs.io/)**
+1. **Go to [Speechmatics](https://www.speechmatics.com/)**
 2. **Sign up/Login**
-3. **Navigate to Profile → API Key**
+3. **Navigate to API Keys section**
 4. **Copy your API key**
 5. **Add it to Vercel environment variables**
 
@@ -129,7 +129,7 @@ vercel env pull .env.local
 ### **Environment Variables**
 ```bash
 # .env.local (for local development)
-ELEVENLABS_API_KEY=your_api_key_here
+SPEECHMATICS_API_KEY=GtUI2oA88OgDfaRIhHIf5RGu09mhcuAs
 ```
 
 ## 🌐 Custom Domain (Optional)
@@ -191,7 +191,7 @@ vercel --prod
 ### **Monitor Usage**:
 
 1. **Vercel Analytics** (if enabled)
-2. **ElevenLabs Dashboard** for API usage
+2. **Speechmatics Dashboard** for API usage
 3. **Browser console** for errors
 
 ## 🔒 Security Best Practices
@@ -204,7 +204,7 @@ vercel --prod
 ## 📞 Support
 
 - **Vercel Documentation**: [vercel.com/docs](https://vercel.com/docs)
-- **ElevenLabs Support**: [elevenlabs.io/support](https://elevenlabs.io/support)
+- **Speechmatics Support**: [speechmatics.com/support](https://www.speechmatics.com/support)
 - **GitHub Issues**: [github.com/Unsaid-afk/voice-controlled-todo-list/issues](https://github.com/Unsaid-afk/voice-controlled-todo-list/issues)
 
 ---

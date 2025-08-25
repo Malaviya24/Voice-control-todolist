@@ -41,6 +41,6 @@
     }
   ],
   "env": {
-    "ELEVENLABS_API_KEY": "@elevenlabs_api_key"
+    "SPEECHMATICS_API_KEY": "@speechmatics_api_key"
   }
 }

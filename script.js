@@ -24,6 +24,7 @@ class VoiceTodoApp {
     }
 
     setupVoiceRecognition() {
+        // Use browser's built-in speech recognition (Speechmatics integration can be added later)
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             this.recognition = new SpeechRecognition();
@@ -445,54 +446,13 @@ class VoiceTodoApp {
     }
 
     async speak(text) {
-        const API_KEY = process.env.ELEVENLABS_API_KEY || 'GtUI2oA88OgDfaRIhHIf5RGu09mhcuAs';
-        
-        try {
-            // Use ElevenLabs API for premium text-to-speech
-            const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'audio/mpeg',
-                    'Content-Type': 'application/json',
-                    'xi-api-key': API_KEY
-                },
-                body: JSON.stringify({
-                    text: text,
-                    model_id: 'eleven_monolingual_v1',
-                    voice_settings: {
-                        stability: 0.5,
-                        similarity_boost: 0.5
-                    }
-                })
-            });
-
-            if (response.ok) {
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-                audio.volume = this.voiceSettings.volume;
-                audio.playbackRate = this.voiceSettings.speed;
-                audio.play();
-            } else {
-                // Fallback to browser speech synthesis
-                if (this.synthesis) {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = this.voiceSettings.speed;
-                    utterance.pitch = 1;
-                    utterance.volume = this.voiceSettings.volume;
-                    this.synthesis.speak(utterance);
-                }
-            }
-        } catch (error) {
-            console.error('TTS API error:', error);
-            // Fallback to browser speech synthesis
-            if (this.synthesis) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = this.voiceSettings.speed;
-                utterance.pitch = 1;
-                utterance.volume = this.voiceSettings.volume;
-                this.synthesis.speak(utterance);
-            }
+        // Use browser's built-in speech synthesis for text-to-speech
+        if (this.synthesis) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = this.voiceSettings.speed;
+            utterance.pitch = 1;
+            utterance.volume = this.voiceSettings.volume;
+            this.synthesis.speak(utterance);
         }
     }
 
