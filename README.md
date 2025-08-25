@@ -4,7 +4,7 @@
 
 [![Voice-Controlled](https://img.shields.io/badge/Voice-Controlled-00d4ff?style=for-the-badge&logo=mic&logoColor=white)](https://github.com/Unsaid-afk/voice-controlled-todo-list)
 [![HTTPS Ready](https://img.shields.io/badge/HTTPS-Ready-4CAF50?style=for-the-badge&logo=lock&logoColor=white)](https://github.com/Unsaid-afk/voice-controlled-todo-list)
-[![Premium TTS](https://img.shields.io/badge/TTS-ElevenLabs-FF6B6B?style=for-the-badge&logo=speech&logoColor=white)](https://elevenlabs.io/)
+[![Speech Recognition](https://img.shields.io/badge/Speech-Recognition-00d4ff?style=for-the-badge&logo=mic&logoColor=white)](https://www.speechmatics.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/Unsaid-afk/voice-controlled-todo-list?style=social)](https://github.com/Unsaid-afk/voice-controlled-todo-list/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Unsaid-afk/voice-controlled-todo-list?style=social)](https://github.com/Unsaid-afk/voice-controlled-todo-list/network)
@@ -30,7 +30,7 @@
 
 ### 🎤 **Voice Control**
 - **Natural Voice Commands**: Intuitive voice interaction with natural language processing
-- **Premium Text-to-Speech**: ElevenLabs API integration for human-like voice responses
+- **Browser Text-to-Speech**: Built-in speech synthesis for voice responses
 - **Voice Settings**: Customizable volume and speed controls with real-time preview
 - **Smart Recognition**: Advanced pattern matching for various voice command formats
 
@@ -122,12 +122,12 @@ ngrok http 8000
 
 ### API Configuration
 
-The application uses ElevenLabs API for premium text-to-speech functionality.
+The application uses Speechmatics API for enhanced speech recognition (optional).
 
-1. **Get API Key**: Sign up at [ElevenLabs](https://elevenlabs.io/)
-2. **Configure**: Replace the API key in `script.js`:
-```javascript
-const API_KEY = 'your-api-key-here';
+1. **Get API Key**: Sign up at [Speechmatics](https://www.speechmatics.com/)
+2. **Configure**: Add the API key to environment variables:
+```bash
+SPEECHMATICS_API_KEY=your-api-key-here
 ```
 
 ## 📁 Project Structure
@@ -149,7 +149,7 @@ voice-controlled-todo-list/
 |----------|------------|
 | **Frontend** | HTML5, CSS3, Vanilla JavaScript (ES6+) |
 | **Voice API** | Web Speech API (SpeechRecognition & SpeechSynthesis) |
-| **TTS Service** | ElevenLabs Text-to-Speech API |
+| **Speech Recognition** | Web Speech API + Speechmatics (optional) |
 | **Storage** | localStorage for data persistence |
 | **Styling** | CSS Grid, Flexbox, CSS Animations |
 | **Icons** | Font Awesome 6 |
@@ -169,7 +169,7 @@ voice-controlled-todo-list/
 
 - **Local Data Storage**: All data stored locally in your browser
 - **HTTPS Requirement**: Voice features require secure connections
-- **API Usage**: ElevenLabs API calls for TTS only (no data storage)
+- **API Usage**: Speechmatics API calls for speech recognition only (no data storage)
 - **Microphone Access**: Requested only when using voice features
 - **No Tracking**: Zero analytics or data collection
 
@@ -224,7 +224,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **[ElevenLabs](https://elevenlabs.io/)** for premium text-to-speech API
+- **[Speechmatics](https://www.speechmatics.com/)** for enhanced speech recognition
 - **[Font Awesome](https://fontawesome.com/)** for beautiful icons
 - **[Google Fonts](https://fonts.google.com/)** for the Inter font family
 - **[Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API)** for voice recognition capabilities
@@ -247,7 +247,7 @@ If you encounter issues:
 |-------|----------|
 | Voice not working | Check HTTPS connection |
 | Microphone denied | Allow permissions in browser |
-| TTS not responding | Verify ElevenLabs API key |
+| Speech recognition not working | Check microphone permissions |
 | Tasks not saving | Check localStorage availability |
 
 ### Getting Help

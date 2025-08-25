@@ -129,8 +129,8 @@ docker run -p 80:80 voice-todo
 For production deployment, consider setting these environment variables:
 
 ```bash
-# ElevenLabs API Key (if using your own)
-ELEVENLABS_API_KEY=your-api-key-here
+# Speechmatics API Key (optional)
+SPEECHMATICS_API_KEY=your-api-key-here
 
 # Custom domain (if applicable)
 CUSTOM_DOMAIN=your-domain.com
