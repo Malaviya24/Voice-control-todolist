@@ -287,12 +287,24 @@ body {
 .input-container {
     display: flex;
     gap: 15px;
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
-.todo-input {
+.input-group {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.todo-input {
+    width: 100%;
     padding: 15px 20px;
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
@@ -308,6 +320,170 @@ body {
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
     color: #ffffff;
+}
+
+/* AI Recommendations Dropdown */
+.ai-recommendations {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+    border: 2px solid rgba(0, 212, 255, 0.3);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    backdrop-filter: blur(10px);
+}
+
+.ai-recommendations.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.recommendations-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(0, 212, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    font-weight: 600;
+    color: #00d4ff;
+    font-size: 0.9rem;
+}
+
+.click-hint {
+    margin-left: auto;
+    font-size: 0.7rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.recommendations-list {
+    padding: 10px 0;
+}
+
+.recommendation-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+.recommendation-item:hover {
+    background: rgba(0, 212, 255, 0.15);
+    border-color: #00d4ff;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2);
+}
+
+.recommendation-item:active {
+    transform: translateX(3px) scale(0.98);
+    background: rgba(0, 212, 255, 0.2);
+}
+
+.recommendation-item::before {
+    content: '👆';
+    position: absolute;
+    left: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-size: 0.8rem;
+}
+
+.recommendation-item:hover::before {
+    opacity: 1;
+}
+
+.recommendation-item:last-child {
+    border-bottom: none;
+}
+
+.recommendation-text {
+    flex: 1;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+}
+
+.recommendation-type {
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.recommendation-confidence {
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.input-options {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.date-input, .type-select {
+    padding: 8px 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.date-input:focus, .type-select:focus {
+    outline: none;
+    border-color: #00d4ff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Fix dropdown options visibility */
+.type-select option {
+    background: #000000;
+    color: #ffffff;
+    padding: 8px;
+}
+
+.type-filter option {
+    background: #000000;
+    color: #ffffff;
+    padding: 8px;
+}
+
+.date-input {
+    flex: 1;
+    min-width: 150px;
+}
+
+.type-select {
+    flex: 1;
+    min-width: 120px;
 }
 
 .add-btn {
@@ -358,11 +534,87 @@ body {
     color: #00d4ff;
 }
 
+/* Date Picker */
+.date-picker-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(0, 212, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.date-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #00d4ff;
+    font-size: 0.9rem;
+}
+
+.date-filter {
+    padding: 8px 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.date-filter:focus {
+    outline: none;
+    border-color: #00d4ff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.today-btn {
+    background: rgba(0, 212, 255, 0.1);
+    border: 2px solid rgba(0, 212, 255, 0.3);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #00d4ff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.today-btn:hover {
+    background: rgba(0, 212, 255, 0.2);
+    transform: translateY(-1px);
+}
+
 .todo-filters {
     display: flex;
     gap: 10px;
     margin-bottom: 25px;
     justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.type-filters {
+    margin-left: 20px;
+}
+
+.type-filter {
+    padding: 8px 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.type-filter:focus {
+    outline: none;
+    border-color: #00d4ff;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .filter-btn {
@@ -401,7 +653,7 @@ body {
     border-radius: 12px;
     padding: 20px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 15px;
     transition: all 0.3s ease;
     animation: slideIn 0.3s ease;
@@ -448,16 +700,73 @@ body {
     opacity: 1;
 }
 
-.todo-text {
+.todo-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.todo-text {
     font-size: 1rem;
     color: #e0e0e0;
     word-break: break-word;
+    line-height: 1.4;
 }
 
 .todo-item.completed .todo-text {
     text-decoration: line-through;
     color: #888;
+}
+
+.todo-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.8rem;
+}
+
+.todo-type {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.todo-type.work {
+    background: rgba(33, 150, 243, 0.2);
+    color: #2196F3;
+}
+
+.todo-type.personal {
+    background: rgba(156, 39, 176, 0.2);
+    color: #9C27B0;
+}
+
+.todo-type.study {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+}
+
+.todo-type.health {
+    background: rgba(255, 152, 0, 0.2);
+    color: #FF9800;
+}
+
+.todo-type.shopping {
+    background: rgba(255, 193, 7, 0.2);
+    color: #FFC107;
+}
+
+.todo-type.other {
+    background: rgba(158, 158, 158, 0.2);
+    color: #9E9E9E;
+}
+
+.todo-date {
+    color: #888;
+    font-size: 0.75rem;
 }
 
 .todo-actions {
@@ -506,6 +815,96 @@ body {
 .empty-state p {
     font-size: 1rem;
     color: #888;
+}
+
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+    border-radius: 12px;
+    padding: 15px 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transform: translateX(-400px);
+    transition: transform 0.3s ease;
+    max-width: 350px;
+    border-left: 4px solid #00d4ff;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast.success {
+    border-left-color: #4CAF50;
+}
+
+.toast.warning {
+    border-left-color: #ff9800;
+}
+
+.toast.error {
+    border-left-color: #f44336;
+}
+
+.toast-icon {
+    font-size: 1.2rem;
+    color: #00d4ff;
+}
+
+.toast.success .toast-icon {
+    color: #4CAF50;
+}
+
+.toast.warning .toast-icon {
+    color: #ff9800;
+}
+
+.toast.error .toast-icon {
+    color: #f44336;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    color: #b0b0b0;
+    font-size: 0.8rem;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: #b0b0b0;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.toast-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
 }
 
 /* Notification */
@@ -623,19 +1022,74 @@ body {
         padding: 20px;
     }
     
+    .input-container {
+        flex-direction: column;
+    }
+    
+    .input-options {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .date-input, .type-select {
+        width: 100%;
+    }
+    
+    .todo-content {
+        gap: 6px;
+    }
+    
+    .todo-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    
     .todo-header {
         flex-direction: column;
         gap: 15px;
         text-align: center;
     }
     
+    .date-picker-container {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
     .todo-filters {
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .type-filters {
+        margin-left: 0;
+    }
+    
+    .ai-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .ai-sidebar-toggle {
+        right: 15px;
+        padding: 12px 16px;
+        font-size: 0.8rem;
     }
     
     .notification {
         right: 15px;
         left: 15px;
+        max-width: none;
+    }
+    
+    .toast-container {
+        left: 15px;
+        right: 15px;
+    }
+    
+    .toast {
         max-width: none;
     }
 }

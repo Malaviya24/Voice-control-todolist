@@ -82,13 +82,42 @@
             <!-- Manual Input Section -->
             <section class="input-section">
                 <div class="input-container">
-                    <input 
-                        type="text" 
-                        id="todoInput" 
-                        class="todo-input" 
-                        placeholder="Type a new task or use voice commands..."
-                        maxlength="100"
-                    >
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="todoInput" 
+                                class="todo-input" 
+                                placeholder="Type a new task or use voice commands..."
+                                maxlength="100"
+                                autocomplete="off"
+                            >
+                            <!-- AI Recommendations Dropdown -->
+                            <div id="aiRecommendations" class="ai-recommendations">
+                                <div class="recommendations-header">
+                                    <i class="fas fa-robot"></i>
+                                    <span>AI Suggestions</span>
+                                    <small class="click-hint">Click to add</small>
+                                    <button onclick="window.app.testAddTask()" style="background: #00d4ff; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 10px;">Test</button>
+                                </div>
+                                <div id="recommendationsList" class="recommendations-list">
+                                    <!-- AI suggestions will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-options">
+                            <input type="date" id="taskDate" class="date-input" title="Select task date">
+                            <select id="taskType" class="type-select" title="Task category">
+                                <option value="">Auto-detect</option>
+                                <option value="work">Work</option>
+                                <option value="personal">Personal</option>
+                                <option value="study">Study</option>
+                                <option value="health">Health</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
                     <button id="addBtn" class="add-btn">
                         <i class="fas fa-plus"></i>
                     </button>
@@ -105,10 +134,30 @@
                     </div>
                 </div>
                 
+                <div class="date-picker-container">
+                    <label for="dateFilter" class="date-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        Select Date:
+                    </label>
+                    <input type="date" id="dateFilter" class="date-filter" title="Filter tasks by date">
+                    <button id="todayBtn" class="today-btn">Today</button>
+                </div>
+                
                 <div class="todo-filters">
                     <button class="filter-btn active" data-filter="all">All</button>
                     <button class="filter-btn" data-filter="active">Active</button>
                     <button class="filter-btn" data-filter="completed">Completed</button>
+                    <div class="type-filters">
+                        <select id="typeFilter" class="type-filter">
+                            <option value="">All Types</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="study">Study</option>
+                            <option value="health">Health</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="todo-list" id="todoList">
@@ -123,10 +172,16 @@
             </section>
         </main>
 
+
         <!-- Notification -->
         <div id="notification" class="notification">
             <i class="notification-icon"></i>
             <span class="notification-text"></span>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container">
+            <!-- Toast notifications will be added here -->
         </div>
     </div>
 

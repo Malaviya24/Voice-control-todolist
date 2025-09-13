@@ -3,6 +3,8 @@ class VoiceTodoApp {
     constructor() {
         this.todos = JSON.parse(localStorage.getItem('voiceTodos')) || [];
         this.currentFilter = 'all';
+        this.currentDate = null;
+        this.currentType = '';
         this.isListening = false;
         this.recognition = null;
         this.synthesis = window.speechSynthesis;
@@ -10,6 +12,8 @@ class VoiceTodoApp {
             volume: parseFloat(localStorage.getItem('voiceVolume')) || 0.8,
             speed: parseFloat(localStorage.getItem('voiceSpeed')) || 1.0
         };
+        this.aiSuggestions = [];
+        this.notificationPermission = false;
         
         this.init();
     }
@@ -17,6 +21,8 @@ class VoiceTodoApp {
     init() {
         this.setupVoiceRecognition();
         this.setupEventListeners();
+        this.setupDatePicker();
+        this.setupNotifications();
         this.renderTodos();
         this.updateStats();
         this.updateConnectionStatus();
@@ -185,6 +191,37 @@ class VoiceTodoApp {
             });
         });
 
+        // Date filter
+        document.getElementById('dateFilter').addEventListener('change', (e) => {
+            this.setDateFilter(e.target.value);
+        });
+
+        // Today button
+        document.getElementById('todayBtn').addEventListener('click', () => {
+            this.setToday();
+        });
+
+        // Type filter
+        document.getElementById('typeFilter').addEventListener('change', (e) => {
+            this.setTypeFilter(e.target.value);
+        });
+
+        // AI Recommendations
+        document.getElementById('todoInput').addEventListener('input', (e) => {
+            this.handleInputChange(e.target.value);
+        });
+
+        document.getElementById('todoInput').addEventListener('focus', () => {
+            this.showRecommendations();
+        });
+
+        document.getElementById('todoInput').addEventListener('blur', (e) => {
+            // Delay hiding to allow clicking on recommendations
+            setTimeout(() => {
+                this.hideRecommendations();
+            }, 200);
+        });
+
         // Voice settings
         this.setupVoiceSettings();
 
@@ -199,6 +236,10 @@ class VoiceTodoApp {
                     case 'm':
                         e.preventDefault();
                         this.toggleVoiceRecognition();
+                        break;
+                    case 'a':
+                        e.preventDefault();
+                        this.toggleAISidebar();
                         break;
                 }
             }
@@ -355,18 +396,23 @@ class VoiceTodoApp {
     }
 
     addTodoByVoice(text) {
+        const detectedType = this.detectTaskType(text);
         const todo = {
             id: Date.now(),
             text: text,
             completed: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            date: this.currentDate || new Date().toISOString().split('T')[0],
+            type: detectedType,
+            reminderTime: null
         };
         
         this.todos.push(todo);
         this.saveTodos();
         this.renderTodos();
         this.updateStats();
-        this.speak(`Added task: ${text}`);
+        this.generateAISuggestions();
+        this.speak(`Added ${detectedType} task: ${text}`);
         this.showNotification(`Added: ${text}`, 'success');
     }
 
@@ -432,21 +478,32 @@ class VoiceTodoApp {
 
     addTodo() {
         const input = document.getElementById('todoInput');
+        const dateInput = document.getElementById('taskDate');
+        const typeInput = document.getElementById('taskType');
         const text = input.value.trim();
         
         if (text) {
+            const selectedType = typeInput.value || this.detectTaskType(text);
+            const selectedDate = dateInput.value || new Date().toISOString().split('T')[0];
+            
             const todo = {
                 id: Date.now(),
                 text: text,
                 completed: false,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                date: selectedDate,
+                type: selectedType,
+                reminderTime: null
             };
             
             this.todos.push(todo);
             this.saveTodos();
             this.renderTodos();
             this.updateStats();
+            this.generateAISuggestions();
             input.value = '';
+            dateInput.value = '';
+            typeInput.value = '';
             this.showNotification(`Added: ${text}`, 'success');
         }
     }
@@ -495,6 +552,7 @@ class VoiceTodoApp {
         
         let filteredTodos = this.todos;
         
+        // Apply status filter
         switch (this.currentFilter) {
             case 'active':
                 filteredTodos = this.todos.filter(todo => !todo.completed);
@@ -502,6 +560,16 @@ class VoiceTodoApp {
             case 'completed':
                 filteredTodos = this.todos.filter(todo => todo.completed);
                 break;
+        }
+
+        // Apply date filter
+        if (this.currentDate) {
+            filteredTodos = filteredTodos.filter(todo => todo.date === this.currentDate);
+        }
+
+        // Apply type filter
+        if (this.currentType) {
+            filteredTodos = filteredTodos.filter(todo => todo.type === this.currentType);
         }
         
         if (filteredTodos.length === 0) {
@@ -517,23 +585,49 @@ class VoiceTodoApp {
                 this.todos.filter(t => !t.completed).indexOf(todo) + 1 : 
                 index + 1;
             
+            const taskDate = new Date(todo.date).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            
             return `
                 <div class="todo-item ${todo.completed ? 'completed' : ''}" data-id="${todo.id}">
-                    <div class="todo-checkbox ${todo.completed ? 'checked' : ''}" onclick="app.toggleTodo(${todo.id})">
+                    <div class="todo-checkbox ${todo.completed ? 'checked' : ''}" data-todo-id="${todo.id}">
                         <i class="fas fa-check"></i>
                     </div>
-                    <div class="todo-text">
-                        ${this.currentFilter === 'all' && !todo.completed ? `<span class="task-number">${displayNumber}.</span> ` : ''}
-                        ${todo.text}
+                    <div class="todo-content">
+                        <div class="todo-text">
+                            ${this.currentFilter === 'all' && !todo.completed ? `<span class="task-number">${displayNumber}.</span> ` : ''}
+                            ${todo.text}
+                        </div>
+                        <div class="todo-meta">
+                            <span class="todo-type ${todo.type}">${todo.type}</span>
+                            <span class="todo-date">${taskDate}</span>
+                        </div>
                     </div>
                     <div class="todo-actions">
-                        <button class="todo-btn delete" onclick="app.deleteTodo(${todo.id})" title="Delete task">
+                        <button class="todo-btn delete" data-todo-id="${todo.id}" title="Delete task">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
             `;
         }).join('');
+
+        // Add event listeners for todo items
+        todoList.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', (e) => {
+                const todoId = parseInt(e.currentTarget.getAttribute('data-todo-id'));
+                this.toggleTodo(todoId);
+            });
+        });
+
+        todoList.querySelectorAll('.todo-btn.delete').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const todoId = parseInt(e.currentTarget.getAttribute('data-todo-id'));
+                this.deleteTodo(todoId);
+            });
+        });
     }
 
     updateStats() {
@@ -570,6 +664,338 @@ class VoiceTodoApp {
         setTimeout(() => {
             notification.classList.remove('show');
         }, 3000);
+    }
+
+    // Date functionality
+    setupDatePicker() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('taskDate').value = today;
+        document.getElementById('dateFilter').value = today;
+        this.currentDate = today;
+    }
+
+    setDateFilter(date) {
+        this.currentDate = date;
+        this.renderTodos();
+    }
+
+    setToday() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('dateFilter').value = today;
+        this.currentDate = today;
+        this.renderTodos();
+    }
+
+    setTypeFilter(type) {
+        this.currentType = type;
+        this.renderTodos();
+    }
+
+    // AI Type Detection
+    detectTaskType(text) {
+        const workKeywords = ['meeting', 'project', 'deadline', 'work', 'office', 'client', 'presentation', 'report', 'email', 'call', 'conference'];
+        const personalKeywords = ['home', 'family', 'personal', 'house', 'clean', 'grocery', 'shopping', 'appointment', 'visit'];
+        const studyKeywords = ['study', 'learn', 'read', 'course', 'homework', 'assignment', 'exam', 'research', 'book', 'tutorial'];
+        const healthKeywords = ['exercise', 'gym', 'doctor', 'health', 'fitness', 'workout', 'medical', 'appointment', 'medicine'];
+        const shoppingKeywords = ['buy', 'purchase', 'shop', 'store', 'mall', 'order', 'shopping', 'grocery'];
+
+        const lowerText = text.toLowerCase();
+        
+        if (workKeywords.some(keyword => lowerText.includes(keyword))) return 'work';
+        if (personalKeywords.some(keyword => lowerText.includes(keyword))) return 'personal';
+        if (studyKeywords.some(keyword => lowerText.includes(keyword))) return 'study';
+        if (healthKeywords.some(keyword => lowerText.includes(keyword))) return 'health';
+        if (shoppingKeywords.some(keyword => lowerText.includes(keyword))) return 'shopping';
+        
+        return 'other';
+    }
+
+    // AI Recommendations (Netflix-style)
+    handleInputChange(inputValue) {
+        if (inputValue.length < 2) {
+            this.hideRecommendations();
+            return;
+        }
+
+        const recommendations = this.generateSmartRecommendations(inputValue);
+        this.renderRecommendations(recommendations);
+        this.showRecommendations();
+    }
+
+    generateSmartRecommendations(input) {
+        const allSuggestions = [
+            ...this.getRecurringTasks(),
+            ...this.getPatternSuggestions(),
+            ...this.getSmartSuggestions(input)
+        ];
+
+        // Filter and score based on input
+        const filtered = allSuggestions
+            .map(suggestion => ({
+                ...suggestion,
+                score: this.calculateRelevanceScore(input, suggestion.text)
+            }))
+            .filter(suggestion => suggestion.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 5); // Show top 5 recommendations
+
+        return filtered;
+    }
+
+    getSmartSuggestions(input) {
+        const suggestions = [];
+        const lowerInput = input.toLowerCase();
+
+        // Context-aware suggestions based on what user is typing
+        if (lowerInput.includes('meet') || lowerInput.includes('call')) {
+            suggestions.push({ text: 'Schedule team meeting', type: 'work', id: Date.now() + Math.random() });
+            suggestions.push({ text: 'Call client about project', type: 'work', id: Date.now() + Math.random() });
+        }
+
+        if (lowerInput.includes('buy') || lowerInput.includes('shop')) {
+            suggestions.push({ text: 'Buy groceries', type: 'shopping', id: Date.now() + Math.random() });
+            suggestions.push({ text: 'Order office supplies', type: 'shopping', id: Date.now() + Math.random() });
+        }
+
+        if (lowerInput.includes('study') || lowerInput.includes('learn')) {
+            suggestions.push({ text: 'Review course materials', type: 'study', id: Date.now() + Math.random() });
+            suggestions.push({ text: 'Complete assignment', type: 'study', id: Date.now() + Math.random() });
+        }
+
+        if (lowerInput.includes('exercise') || lowerInput.includes('gym')) {
+            suggestions.push({ text: 'Go for a run', type: 'health', id: Date.now() + Math.random() });
+            suggestions.push({ text: 'Gym workout session', type: 'health', id: Date.now() + Math.random() });
+        }
+
+        // Time-based suggestions
+        const hour = new Date().getHours();
+        if (hour >= 9 && hour <= 17) {
+            suggestions.push({ text: 'Check emails', type: 'work', id: Date.now() + Math.random() });
+            suggestions.push({ text: 'Update project status', type: 'work', id: Date.now() + Math.random() });
+        } else if (hour >= 18 && hour <= 22) {
+            suggestions.push({ text: 'Plan tomorrow', type: 'personal', id: Date.now() + Math.random() });
+            suggestions.push({ text: 'Family time', type: 'personal', id: Date.now() + Math.random() });
+        }
+
+        return suggestions;
+    }
+
+    calculateRelevanceScore(input, suggestionText) {
+        const inputWords = input.toLowerCase().split(' ');
+        const suggestionWords = suggestionText.toLowerCase().split(' ');
+        
+        let score = 0;
+        
+        // Exact word matches
+        inputWords.forEach(inputWord => {
+            suggestionWords.forEach(suggestionWord => {
+                if (suggestionWord.includes(inputWord) || inputWord.includes(suggestionWord)) {
+                    score += 2;
+                }
+            });
+        });
+
+        // Partial matches
+        inputWords.forEach(inputWord => {
+            if (suggestionText.toLowerCase().includes(inputWord)) {
+                score += 1;
+            }
+        });
+
+        return score;
+    }
+
+    showRecommendations() {
+        const recommendations = document.getElementById('aiRecommendations');
+        recommendations.classList.add('show');
+    }
+
+    hideRecommendations() {
+        const recommendations = document.getElementById('aiRecommendations');
+        recommendations.classList.remove('show');
+    }
+
+    renderRecommendations(recommendations) {
+        const recommendationsList = document.getElementById('recommendationsList');
+        
+        if (recommendations.length === 0) {
+            recommendationsList.innerHTML = '<div class="recommendation-item"><div class="recommendation-text">No suggestions available</div></div>';
+            return;
+        }
+
+        recommendationsList.innerHTML = recommendations.map((rec, index) => `
+            <div class="recommendation-item" data-text="${rec.text}" data-type="${rec.type}" data-index="${index}">
+                <div class="recommendation-text">${rec.text}</div>
+                <div class="recommendation-type">${rec.type}</div>
+                <div class="recommendation-confidence">${Math.round(rec.score * 20)}% match</div>
+            </div>
+        `).join('');
+
+        // Add event listeners to each recommendation item
+        recommendationsList.querySelectorAll('.recommendation-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const text = e.currentTarget.getAttribute('data-text');
+                const type = e.currentTarget.getAttribute('data-type');
+                console.log('Clicked recommendation:', text, type);
+                this.selectRecommendation(text, type);
+            });
+        });
+    }
+
+    selectRecommendation(text, type) {
+        console.log('selectRecommendation called with:', text, type);
+        
+        try {
+            // Hide the recommendations dropdown first
+            this.hideRecommendations();
+            
+            // Get the selected date
+            const selectedDate = document.getElementById('taskDate').value || new Date().toISOString().split('T')[0];
+            
+            // Create the todo object directly
+            const todo = {
+                id: Date.now(),
+                text: text,
+                completed: false,
+                createdAt: new Date().toISOString(),
+                date: selectedDate,
+                type: type,
+                reminderTime: null
+            };
+            
+            console.log('Created todo:', todo);
+            
+            // Add the todo directly to the array
+            this.todos.push(todo);
+            console.log('Todos after push:', this.todos);
+            
+            // Save and render
+            this.saveTodos();
+            this.renderTodos();
+            this.updateStats();
+            
+            // Clear the input field
+            document.getElementById('todoInput').value = '';
+            document.getElementById('taskType').value = '';
+            
+            // Show success notifications
+            this.showNotification(`Added: ${text}`, 'success');
+            
+            console.log('Task added successfully!');
+            
+        } catch (error) {
+            console.error('Error adding task:', error);
+            this.showNotification('Error adding task', 'error');
+        }
+    }
+
+    // Test function to verify task addition works
+    testAddTask() {
+        console.log('Test button clicked');
+        this.selectRecommendation('Test Task', 'work');
+    }
+
+    getRecurringTasks() {
+        const recurring = [];
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const dayOfMonth = today.getDate();
+
+        // Daily recurring tasks
+        if (dayOfWeek === 1) recurring.push({ text: 'Plan weekly goals', type: 'work', recurring: 'weekly' });
+        if (dayOfWeek === 5) recurring.push({ text: 'Review weekly progress', type: 'work', recurring: 'weekly' });
+        if (dayOfWeek === 0) recurring.push({ text: 'Plan next week', type: 'personal', recurring: 'weekly' });
+
+        // Monthly recurring tasks
+        if (dayOfMonth === 1) recurring.push({ text: 'Monthly budget review', type: 'personal', recurring: 'monthly' });
+        if (dayOfMonth === 15) recurring.push({ text: 'Mid-month check-in', type: 'work', recurring: 'monthly' });
+
+        // Health reminders
+        recurring.push({ text: 'Drink water', type: 'health', recurring: 'daily' });
+        if (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5) {
+            recurring.push({ text: 'Exercise session', type: 'health', recurring: 'weekly' });
+        }
+
+        return recurring.map(task => ({
+            ...task,
+            id: Date.now() + Math.random(),
+            clickable: true
+        }));
+    }
+
+    getPatternSuggestions() {
+        const patterns = [];
+        const recentTasks = this.todos.slice(-10);
+        const typeCounts = {};
+
+        // Analyze recent task types
+        recentTasks.forEach(task => {
+            typeCounts[task.type] = (typeCounts[task.type] || 0) + 1;
+        });
+
+        // Suggest based on patterns
+        if (typeCounts.work > 3) {
+            patterns.push({ text: 'Take a break', type: 'health', id: Date.now() + Math.random() });
+        }
+        if (typeCounts.study > 2) {
+            patterns.push({ text: 'Review notes', type: 'study', id: Date.now() + Math.random() });
+        }
+        if (typeCounts.personal > 2) {
+            patterns.push({ text: 'Call family', type: 'personal', id: Date.now() + Math.random() });
+        }
+
+        return patterns.map(task => ({
+            ...task,
+            clickable: true
+        }));
+    }
+
+
+    // Notifications
+    setupNotifications() {
+        if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+                this.notificationPermission = permission === 'granted';
+            });
+        }
+    }
+
+    showToast(title, message, type = 'info') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icon = type === 'success' ? 'check-circle' : 
+                    type === 'warning' ? 'exclamation-triangle' : 
+                    type === 'error' ? 'times-circle' : 'info-circle';
+        
+        toast.innerHTML = `
+            <i class="fas fa-${icon} toast-icon"></i>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
+    showBrowserNotification(title, message) {
+        if (this.notificationPermission && 'Notification' in window) {
+            new Notification(title, {
+                body: message,
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎤</text></svg>'
+            });
+        }
     }
 }
 
