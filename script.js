@@ -14,9 +14,11 @@ class VoiceTodoApp {
         };
         this.aiSuggestions = [];
         this.notificationPermission = false;
+        this.themes = ['dark', 'light', 'blue', 'purple'];
+        this.currentThemeIndex = parseInt(localStorage.getItem('themeIndex')) || 0;
+        this.currentTheme = this.themes[this.currentThemeIndex];
         
         // New features
-        this.currentTheme = localStorage.getItem('theme') || 'dark';
         this.timeTracking = JSON.parse(localStorage.getItem('timeTracking')) || {};
         this.goals = JSON.parse(localStorage.getItem('goals')) || [];
         this.activeTimers = new Map();
@@ -34,10 +36,66 @@ class VoiceTodoApp {
         this.init();
     }
 
+    // Theme Toggle Functionality
+    toggleTheme() {
+        this.currentThemeIndex = (this.currentThemeIndex + 1) % this.themes.length;
+        this.currentTheme = this.themes[this.currentThemeIndex];
+        localStorage.setItem('themeIndex', this.currentThemeIndex);
+        localStorage.setItem('theme', this.currentTheme);
+        this.applyTheme();
+        this.updateThemeIcon();
+    }
+
+    applyTheme() {
+        document.body.setAttribute('data-theme', this.currentTheme);
+    }
+
+    updateThemeIcon() {
+        const olderThemeBtn = document.getElementById('olderThemeBtn');
+        if (olderThemeBtn) {
+            const icon = olderThemeBtn.querySelector('i');
+            if (icon) {
+                const iconMap = {
+                    'dark': 'fas fa-moon',
+                    'light': 'fas fa-sun',
+                    'blue': 'fas fa-droplet',
+                    'purple': 'fas fa-palette'
+                };
+                icon.className = iconMap[this.currentTheme] || 'fas fa-palette';
+            }
+        }
+    }
+
+    showOlderTheme() {
+        // Cycle through all themes
+        this.toggleTheme();
+        
+        // Show notification about current theme
+        const themeNames = {
+            'dark': 'Dark',
+            'light': 'Light',
+            'blue': 'Blue',
+            'purple': 'Purple'
+        };
+        const themeName = themeNames[this.currentTheme] || 'Unknown';
+        this.showNotification(`Switched to ${themeName} theme`, 'success');
+        
+        // Add visual feedback
+        const olderThemeBtn = document.getElementById('olderThemeBtn');
+        if (olderThemeBtn) {
+            olderThemeBtn.classList.add('active');
+            setTimeout(() => {
+                olderThemeBtn.classList.remove('active');
+            }, 1000);
+        }
+    }
+
     init() {
         this.setupVoiceRecognition();
         this.setupEventListeners();
         this.setupDatePicker();
+        this.applyTheme();
+        this.updateThemeIcon();
         this.setupNotifications();
         this.initTheme();
         this.initClock();
@@ -207,6 +265,14 @@ class VoiceTodoApp {
                 this.addTodo();
             }
         });
+
+        // Theme toggle button
+        const olderThemeBtn = document.getElementById('olderThemeBtn');
+        if (olderThemeBtn) {
+            olderThemeBtn.addEventListener('click', () => {
+                this.showOlderTheme();
+            });
+        }
 
         // Filter buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {

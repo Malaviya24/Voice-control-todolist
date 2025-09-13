@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Toggle Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body data-theme="dark">
+    <div class="container">
+        <div class="header">
+            <div class="header-controls">
+                <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="settings-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            <h1 class="app-title">
+                <i class="fas fa-microphone"></i>
+                Voice Todo
+            </h1>
+            <p class="app-subtitle">Test Theme Toggle</p>
+        </div>
+
+        <div class="main-content">
+            <div class="voice-section glass-card">
+                <div class="voice-controls">
+                    <button class="voice-btn">
+                        <i class="fas fa-microphone"></i>
+                        <span>Tap to speak</span>
+                    </button>
+                    <div class="voice-status">Click the theme toggle button above to test</div>
+                </div>
+            </div>
+
+            <div class="todo-section glass-card">
+                <div class="todo-header">
+                    <h2>Test Section</h2>
+                    <div class="todo-stats">
+                        <span>Theme: <span id="currentTheme">dark</span></span>
+                    </div>
+                </div>
+                <div class="todo-list">
+                    <div class="todo-item">
+                        <input type="checkbox" class="todo-checkbox">
+                        <div class="todo-content">
+                            <div class="todo-text">This is a test todo item</div>
+                            <div class="todo-meta">
+                                <span class="todo-type">test</span>
+                                <span class="todo-date">Today</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ThemeTest {
+            constructor() {
+                this.currentTheme = localStorage.getItem('theme') || 'dark';
+                this.init();
+            }
+
+            init() {
+                this.applyTheme();
+                this.updateThemeIcon();
+                this.setupEventListeners();
+            }
+
+            toggleTheme() {
+                this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('theme', this.currentTheme);
+                this.applyTheme();
+                this.updateThemeIcon();
+                this.updateThemeDisplay();
+            }
+
+            applyTheme() {
+                document.body.setAttribute('data-theme', this.currentTheme);
+            }
+
+            updateThemeIcon() {
+                const themeIcon = document.getElementById('themeIcon');
+                if (themeIcon) {
+                    themeIcon.className = this.currentTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+                }
+            }
+
+            updateThemeDisplay() {
+                const themeDisplay = document.getElementById('currentTheme');
+                if (themeDisplay) {
+                    themeDisplay.textContent = this.currentTheme;
+                }
+            }
+
+            setupEventListeners() {
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', () => {
+                        this.toggleTheme();
+                    });
+                }
+            }
+        }
+
+        // Initialize the theme test
+        new ThemeTest();
+    </script>
+</body>
+</html>
