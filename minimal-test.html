@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Test</title>
+</head>
+<body>
+    <h1>Minimal Voice Todo Test</h1>
+    
+    <div>
+        <button id="voiceBtn">🎤 Voice</button>
+        <div id="voiceStatus">Ready</div>
+        <div id="voiceIndicator"></div>
+    </div>
+    
+    <div>
+        <input type="text" id="todoInput" placeholder="Add task...">
+        <button id="addBtn">Add</button>
+    </div>
+    
+    <div id="todoList"></div>
+    
+    <div>
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Simple test without the full app
+        document.addEventListener('DOMContentLoaded', () => {
+            const results = document.getElementById('results');
+            
+            // Test elements
+            const elements = ['voiceBtn', 'voiceStatus', 'voiceIndicator', 'todoInput', 'addBtn', 'todoList'];
+            let html = '<h4>Elements:</h4>';
+            elements.forEach(id => {
+                const el = document.getElementById(id);
+                html += `<p>${id}: ${el ? '✅' : '❌'}</p>`;
+            });
+            
+            // Test voice recognition
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                html += '<p>Voice Recognition: ✅ Supported</p>';
+            } else {
+                html += '<p>Voice Recognition: ❌ Not Supported</p>';
+            }
+            
+            // Test timer functionality
+            const testText = "30 min timer";
+            const timerPattern = /(\d+)\s*min(?:ute|utes?)?\s*timer/i;
+            const match = testText.match(timerPattern);
+            html += `<p>Timer Pattern Test: ${match ? '✅ Matches' : '❌ No Match'}</p>`;
+            
+            results.innerHTML = html;
+            
+            // Test voice button
+            document.getElementById('voiceBtn').addEventListener('click', () => {
+                results.innerHTML += '<p>Voice button clicked!</p>';
+            });
+            
+            // Test add button
+            document.getElementById('addBtn').addEventListener('click', () => {
+                const input = document.getElementById('todoInput');
+                const text = input.value;
+                if (text) {
+                    const todoList = document.getElementById('todoList');
+                    todoList.innerHTML += `<div>✅ ${text}</div>`;
+                    input.value = '';
+                    
+                    // Test timer detection
+                    if (text.toLowerCase().includes('timer')) {
+                        results.innerHTML += `<p>Timer detected in: "${text}"</p>`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Voice Todo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Debug Voice Todo</h1>
+        
+        <!-- Voice Control Section -->
+        <section class="voice-section glass-card">
+            <div class="voice-controls">
+                <button id="voiceBtn" class="voice-btn">
+                    <i class="fas fa-microphone"></i>
+                    <span>Tap to speak</span>
+                </button>
+                <div id="voiceStatus" class="voice-status">Ready to listen</div>
+                <div id="voiceIndicator" class="voice-indicator"></div>
+            </div>
+        </section>
+
+        <!-- Input Section -->
+        <section class="input-section glass-card">
+            <div class="input-wrapper">
+                <input type="text" id="todoInput" class="todo-input" placeholder="Add a new task...">
+                <button id="addBtn" class="add-btn">
+                    <i class="fas fa-plus"></i>
+                    Add Task
+                </button>
+            </div>
+        </section>
+
+        <!-- Todo List -->
+        <section class="todo-section glass-card">
+            <div class="todo-list" id="todoList">
+                <!-- Tasks will appear here -->
+            </div>
+        </section>
+
+        <!-- Debug Info -->
+        <section class="glass-card">
+            <h3>Debug Info</h3>
+            <div id="debugInfo"></div>
+            <button onclick="testElements()">Test Elements</button>
+            <button onclick="testTimer()">Test Timer</button>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function testElements() {
+            const debugInfo = document.getElementById('debugInfo');
+            const elements = [
+                'voiceBtn', 'voiceStatus', 'voiceIndicator',
+                'todoInput', 'addBtn', 'todoList'
+            ];
+            
+            let html = '<h4>Element Status:</h4>';
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                html += `<p>${id}: ${element ? '✅ Found' : '❌ Missing'}</p>`;
+            });
+            
+            debugInfo.innerHTML = html;
+        }
+
+        function testTimer() {
+            if (window.app) {
+                window.app.testTimerAlarm();
+                document.getElementById('debugInfo').innerHTML += '<p>✅ Timer test completed - check console</p>';
+            } else {
+                document.getElementById('debugInfo').innerHTML += '<p>❌ App not initialized</p>';
+            }
+        }
+
+        // Test on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testElements();
+                if (window.app) {
+                    document.getElementById('debugInfo').innerHTML += '<p>✅ App initialized successfully</p>';
+                } else {
+                    document.getElementById('debugInfo').innerHTML += '<p>❌ App failed to initialize</p>';
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

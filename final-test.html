@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Test - All Problems Solved</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Final Test - All Problems Solved</h1>
+        
+        <!-- Status Display -->
+        <section class="glass-card">
+            <h2>📊 Status Check</h2>
+            <div id="statusDisplay">
+                <p>Checking all systems...</p>
+            </div>
+        </section>
+
+        <!-- Voice Control -->
+        <section class="voice-section glass-card">
+            <div class="voice-controls">
+                <button id="voiceBtn" class="voice-btn">
+                    <i class="fas fa-microphone"></i>
+                    <span>Tap to speak</span>
+                </button>
+                <div id="voiceStatus" class="voice-status">Ready to listen</div>
+                <div id="voiceIndicator" class="voice-indicator"></div>
+            </div>
+        </section>
+
+        <!-- Input Section -->
+        <section class="input-section glass-card">
+            <div class="input-wrapper">
+                <input type="text" id="todoInput" class="todo-input" placeholder="Try: '30 min timer' or 'alarm 3:00'">
+                <button id="addBtn" class="add-btn">
+                    <i class="fas fa-plus"></i>
+                    Add Task
+                </button>
+            </div>
+        </section>
+
+        <!-- Todo List -->
+        <section class="todo-section glass-card">
+            <div class="todo-list" id="todoList">
+                <!-- Tasks will appear here -->
+            </div>
+        </section>
+
+        <!-- Test Buttons -->
+        <section class="glass-card">
+            <h3>🧪 Test Functions</h3>
+            <button onclick="testVoice()" class="add-btn">Test Voice</button>
+            <button onclick="testTimer()" class="add-btn">Test Timer</button>
+            <button onclick="testSettings()" class="add-btn">Test Settings</button>
+            <button onclick="clearConsole()" class="add-btn">Clear Console</button>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="problem-solver.js"></script>
+    <script>
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusDisplay');
+            const timestamp = new Date().toLocaleTimeString();
+            statusDiv.innerHTML += `<p>[${timestamp}] ${type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️'} ${message}</p>`;
+        }
+
+        function testVoice() {
+            updateStatus('Testing voice recognition...');
+            if (window.app && window.app.recognition) {
+                try {
+                    window.app.toggleVoiceRecognition();
+                    updateStatus('Voice recognition test completed', 'success');
+                } catch (error) {
+                    updateStatus(`Voice test failed: ${error.message}`, 'error');
+                }
+            } else {
+                updateStatus('Voice recognition not available', 'error');
+            }
+        }
+
+        function testTimer() {
+            updateStatus('Testing timer functionality...');
+            if (window.app) {
+                try {
+                    window.app.checkAndCreateTimerOrAlarm('30 min timer', Date.now());
+                    updateStatus('Timer test completed - check if timer was set', 'success');
+                } catch (error) {
+                    updateStatus(`Timer test failed: ${error.message}`, 'error');
+                }
+            } else {
+                updateStatus('App not initialized', 'error');
+            }
+        }
+
+        function testSettings() {
+            updateStatus('Testing settings...');
+            const settingsBtn = document.getElementById('settingsBtn');
+            if (settingsBtn) {
+                settingsBtn.click();
+                updateStatus('Settings modal opened', 'success');
+                setTimeout(() => {
+                    const closeBtn = document.getElementById('closeSettings');
+                    if (closeBtn) closeBtn.click();
+                    updateStatus('Settings modal closed', 'success');
+                }, 2000);
+            } else {
+                updateStatus('Settings button not found', 'error');
+            }
+        }
+
+        function clearConsole() {
+            console.clear();
+            updateStatus('Console cleared', 'success');
+        }
+
+        // Auto-run status check
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                updateStatus('Page loaded successfully', 'success');
+                
+                if (window.app) {
+                    updateStatus('VoiceTodoApp initialized', 'success');
+                } else {
+                    updateStatus('VoiceTodoApp failed to initialize', 'error');
+                }
+
+                // Check for console errors
+                const originalError = console.error;
+                let errorCount = 0;
+                console.error = function(...args) {
+                    errorCount++;
+                    originalError.apply(console, args);
+                };
+
+                setTimeout(() => {
+                    console.error = originalError;
+                    if (errorCount === 0) {
+                        updateStatus('No console errors detected', 'success');
+                    } else {
+                        updateStatus(`${errorCount} console errors detected`, 'error');
+                    }
+                }, 3000);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

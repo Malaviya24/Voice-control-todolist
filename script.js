@@ -15,6 +15,22 @@ class VoiceTodoApp {
         this.aiSuggestions = [];
         this.notificationPermission = false;
         
+        // New features
+        this.currentTheme = localStorage.getItem('theme') || 'dark';
+        this.timeTracking = JSON.parse(localStorage.getItem('timeTracking')) || {};
+        this.goals = JSON.parse(localStorage.getItem('goals')) || [];
+        this.activeTimers = new Map();
+        this.currentCalendarDate = new Date();
+        this.calendarViewVisible = false;
+        this.habits = JSON.parse(localStorage.getItem('habits')) || [];
+        this.alarms = JSON.parse(localStorage.getItem('alarms')) || [];
+        this.timerInterval = null;
+        this.stopwatchInterval = null;
+        this.timerTime = 0;
+        this.stopwatchTime = 0;
+        this.lapTimes = [];
+        this.taskTimers = JSON.parse(localStorage.getItem('taskTimers')) || [];
+        
         this.init();
     }
 
@@ -23,9 +39,17 @@ class VoiceTodoApp {
         this.setupEventListeners();
         this.setupDatePicker();
         this.setupNotifications();
+        this.initTheme();
+        this.initClock();
         this.renderTodos();
         this.updateStats();
         this.updateConnectionStatus();
+        
+        // Delay voice settings setup to ensure DOM is ready
+        setTimeout(() => {
+            this.setupVoiceSettings();
+        }, 100);
+        
         this.showNotification('Welcome to Voice Todo! Tap the microphone to start.', 'info');
     }
 
@@ -222,8 +246,119 @@ class VoiceTodoApp {
             }, 200);
         });
 
-        // Voice settings
-        this.setupVoiceSettings();
+        // Settings Modal
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            this.showSettings();
+        });
+
+        document.getElementById('closeSettings').addEventListener('click', () => {
+            this.hideSettings();
+        });
+
+
+        // Theme Selection
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                this.setTheme(e.currentTarget.dataset.theme);
+            });
+        });
+
+        // Settings
+        document.getElementById('enableTimeTracking').addEventListener('change', (e) => {
+            this.toggleTimeTracking(e.target.checked);
+        });
+
+        document.getElementById('enableGoals').addEventListener('change', (e) => {
+            this.toggleGoals(e.target.checked);
+        });
+
+        // Calendar View
+        document.getElementById('calendarViewBtn').addEventListener('click', () => {
+            this.toggleCalendarView();
+        });
+
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            this.changeMonth(-1);
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            this.changeMonth(1);
+        });
+
+        // Analytics
+        document.getElementById('analyticsBtn').addEventListener('click', () => {
+            this.showAnalytics();
+        });
+
+        document.getElementById('closeAnalytics').addEventListener('click', () => {
+            this.hideAnalytics();
+        });
+
+        document.getElementById('enableAnalytics').addEventListener('change', (e) => {
+            this.toggleAnalytics(e.target.checked);
+        });
+
+        // Habit Tracking
+        document.getElementById('habitsBtn').addEventListener('click', () => {
+            this.showHabits();
+        });
+
+        document.getElementById('closeHabits').addEventListener('click', () => {
+            this.hideHabits();
+        });
+
+        document.getElementById('addHabitBtn').addEventListener('click', () => {
+            this.showAddHabitModal();
+        });
+
+        document.getElementById('enableHabits').addEventListener('change', (e) => {
+            this.toggleHabits(e.target.checked);
+        });
+
+        // Clock Timer and Alarm
+        document.getElementById('clockBtn').addEventListener('click', () => {
+            this.showClock();
+        });
+
+        document.getElementById('closeClock').addEventListener('click', () => {
+            this.hideClock();
+        });
+
+        document.getElementById('addAlarmBtn').addEventListener('click', () => {
+            this.showAddAlarmModal();
+        });
+
+        // Timer controls
+        document.getElementById('timerStart').addEventListener('click', () => {
+            this.startTimer();
+        });
+
+        document.getElementById('timerPause').addEventListener('click', () => {
+            this.pauseTimer();
+        });
+
+        document.getElementById('timerReset').addEventListener('click', () => {
+            this.resetTimer();
+        });
+
+        // Stopwatch controls
+        document.getElementById('stopwatchStart').addEventListener('click', () => {
+            this.startStopwatch();
+        });
+
+        document.getElementById('stopwatchPause').addEventListener('click', () => {
+            this.pauseStopwatch();
+        });
+
+        document.getElementById('stopwatchReset').addEventListener('click', () => {
+            this.resetStopwatch();
+        });
+
+        document.getElementById('stopwatchLap').addEventListener('click', () => {
+            this.addLapTime();
+        });
+
+        // Voice settings are now set up in init() with a delay
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -283,28 +418,37 @@ class VoiceTodoApp {
     setupVoiceSettings() {
         const volumeSlider = document.getElementById('voiceVolume');
         const speedSlider = document.getElementById('voiceSpeed');
-        const volumeValue = volumeSlider.nextElementSibling;
-        const speedValue = speedSlider.nextElementSibling;
+        const volumeValue = document.getElementById('voiceVolumeValue');
+        const speedValue = document.getElementById('voiceSpeedValue');
+        
+        // Check if voice settings elements exist before trying to use them
+        if (!volumeSlider || !speedSlider || !volumeValue || !speedValue) {
+            return; // Silently skip if elements not found
+        }
 
-        // Set initial values
-        volumeSlider.value = this.voiceSettings.volume;
-        speedSlider.value = this.voiceSettings.speed;
-        volumeValue.textContent = Math.round(this.voiceSettings.volume * 100) + '%';
-        speedValue.textContent = this.voiceSettings.speed + 'x';
-
-        // Volume slider
-        volumeSlider.addEventListener('input', (e) => {
-            this.voiceSettings.volume = parseFloat(e.target.value);
+        try {
+            // Set initial values
+            volumeSlider.value = this.voiceSettings.volume;
+            speedSlider.value = this.voiceSettings.speed;
             volumeValue.textContent = Math.round(this.voiceSettings.volume * 100) + '%';
-            localStorage.setItem('voiceVolume', this.voiceSettings.volume);
-        });
-
-        // Speed slider
-        speedSlider.addEventListener('input', (e) => {
-            this.voiceSettings.speed = parseFloat(e.target.value);
             speedValue.textContent = this.voiceSettings.speed + 'x';
-            localStorage.setItem('voiceSpeed', this.voiceSettings.speed);
-        });
+
+            // Volume slider
+            volumeSlider.addEventListener('input', (e) => {
+                this.voiceSettings.volume = parseFloat(e.target.value);
+                volumeValue.textContent = Math.round(this.voiceSettings.volume * 100) + '%';
+                localStorage.setItem('voiceVolume', this.voiceSettings.volume);
+            });
+
+            // Speed slider
+            speedSlider.addEventListener('input', (e) => {
+                this.voiceSettings.speed = parseFloat(e.target.value);
+                speedValue.textContent = this.voiceSettings.speed + 'x';
+                localStorage.setItem('voiceSpeed', this.voiceSettings.speed);
+            });
+        } catch (error) {
+            console.warn('Error setting up voice settings:', error);
+        }
     }
 
     updateConnectionStatus() {
@@ -325,21 +469,31 @@ class VoiceTodoApp {
         const voiceStatus = document.getElementById('voiceStatus');
         const voiceIndicator = document.getElementById('voiceIndicator');
         
-        if (this.isListening) {
-            voiceBtn.classList.add('listening');
-            voiceBtn.querySelector('span').textContent = 'Listening...';
-            voiceStatus.textContent = 'Listening...';
-            voiceIndicator.classList.add('listening');
-        } else {
-            voiceBtn.classList.remove('listening');
-            voiceBtn.querySelector('span').textContent = 'Tap to speak';
-            voiceStatus.textContent = 'Ready to listen';
-            voiceIndicator.classList.remove('listening');
+        // Check if elements exist before trying to update them
+        if (!voiceBtn || !voiceStatus || !voiceIndicator) {
+            return; // Silently skip if elements not found
+        }
+        
+        try {
+            if (this.isListening) {
+                voiceBtn.classList.add('listening');
+                const voiceBtnSpan = voiceBtn.querySelector('span');
+                if (voiceBtnSpan) voiceBtnSpan.textContent = 'Listening...';
+                voiceStatus.textContent = 'Listening...';
+                voiceIndicator.classList.add('listening');
+            } else {
+                voiceBtn.classList.remove('listening');
+                const voiceBtnSpan = voiceBtn.querySelector('span');
+                if (voiceBtnSpan) voiceBtnSpan.textContent = 'Tap to speak';
+                voiceStatus.textContent = 'Ready to listen';
+                voiceIndicator.classList.remove('listening');
+            }
+        } catch (error) {
+            console.warn('Error updating voice UI:', error);
         }
     }
 
     processVoiceCommand(transcript) {
-        console.log('Voice command:', transcript);
         
         // Add task commands
         if (transcript.includes('add task') || transcript.includes('add todo') || transcript.includes('new task')) {
@@ -412,6 +566,10 @@ class VoiceTodoApp {
         this.renderTodos();
         this.updateStats();
         this.generateAISuggestions();
+        
+        // Check for timer/alarm keywords and create them
+        this.checkAndCreateTimerOrAlarm(text, todo.id);
+        
         this.speak(`Added ${detectedType} task: ${text}`);
         this.showNotification(`Added: ${text}`, 'success');
     }
@@ -501,6 +659,10 @@ class VoiceTodoApp {
             this.renderTodos();
             this.updateStats();
             this.generateAISuggestions();
+            
+            // Check for timer/alarm keywords and create them
+            this.checkAndCreateTimerOrAlarm(text, todo.id);
+            
             input.value = '';
             dateInput.value = '';
             typeInput.value = '';
@@ -573,12 +735,12 @@ class VoiceTodoApp {
         }
         
         if (filteredTodos.length === 0) {
-            todoList.innerHTML = '';
-            emptyState.style.display = 'block';
+            todoList.innerHTML = '<div class="empty-state" style="text-align: center; padding: 40px; color: rgba(255, 255, 255, 0.6);"><i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i><h3>No tasks yet</h3><p>Add a new task to get started!</p></div>';
+            if (emptyState) emptyState.style.display = 'block';
             return;
         }
         
-        emptyState.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'none';
         
         todoList.innerHTML = filteredTodos.map((todo, index) => {
             const displayNumber = this.currentFilter === 'all' ? 
@@ -606,6 +768,9 @@ class VoiceTodoApp {
                         </div>
                     </div>
                     <div class="todo-actions">
+                        <button class="todo-btn timer" data-todo-id="${todo.id}" title="Start timer">
+                            <i class="fas fa-play"></i>
+                        </button>
                         <button class="todo-btn delete" data-todo-id="${todo.id}" title="Delete task">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -619,6 +784,13 @@ class VoiceTodoApp {
             checkbox.addEventListener('click', (e) => {
                 const todoId = parseInt(e.currentTarget.getAttribute('data-todo-id'));
                 this.toggleTodo(todoId);
+            });
+        });
+
+        todoList.querySelectorAll('.todo-btn.timer').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const todoId = parseInt(e.currentTarget.getAttribute('data-todo-id'));
+                this.toggleTimer(todoId);
             });
         });
 
@@ -777,6 +949,24 @@ class VoiceTodoApp {
             suggestions.push({ text: 'Family time', type: 'personal', id: Date.now() + Math.random() });
         }
 
+        // Timer and alarm suggestions
+        if (lowerInput.includes('timer') || lowerInput.includes('time')) {
+            suggestions.push({ text: 'Study for 30 minutes timer', type: 'study', id: Date.now() + Math.random() });
+            suggestions.push({ text: 'Workout for 45 minutes timer', type: 'health', id: Date.now() + Math.random() });
+            suggestions.push({ text: 'Focus work for 2 hours timer', type: 'work', id: Date.now() + Math.random() });
+        }
+
+        if (lowerInput.includes('alarm') || lowerInput.includes('remind') || lowerInput.includes('wake')) {
+            const now = new Date();
+            const nextHour = now.getHours() + 1;
+            const nextHourStr = nextHour.toString().padStart(2, '0');
+            const currentMinStr = now.getMinutes().toString().padStart(2, '0');
+            
+            suggestions.push({ text: `Alarm at ${nextHourStr}:${currentMinStr} for meeting`, type: 'work', id: Date.now() + Math.random() });
+            suggestions.push({ text: `Remind me at ${nextHourStr}:30 to call mom`, type: 'personal', id: Date.now() + Math.random() });
+            suggestions.push({ text: `Wake up at 7:00 AM tomorrow`, type: 'personal', id: Date.now() + Math.random() });
+        }
+
         return suggestions;
     }
 
@@ -807,12 +997,27 @@ class VoiceTodoApp {
 
     showRecommendations() {
         const recommendations = document.getElementById('aiRecommendations');
-        recommendations.classList.add('show');
+        if (recommendations) {
+            recommendations.classList.add('show');
+        }
     }
 
     hideRecommendations() {
         const recommendations = document.getElementById('aiRecommendations');
-        recommendations.classList.remove('show');
+        if (recommendations) {
+            recommendations.classList.remove('show');
+        }
+    }
+
+    toggleAISidebar() {
+        const recommendations = document.getElementById('aiRecommendations');
+        if (recommendations) {
+            if (recommendations.classList.contains('show')) {
+                this.hideRecommendations();
+            } else {
+                this.showRecommendations();
+            }
+        }
     }
 
     renderRecommendations(recommendations) {
@@ -836,15 +1041,12 @@ class VoiceTodoApp {
             item.addEventListener('click', (e) => {
                 const text = e.currentTarget.getAttribute('data-text');
                 const type = e.currentTarget.getAttribute('data-type');
-                console.log('Clicked recommendation:', text, type);
                 this.selectRecommendation(text, type);
             });
         });
     }
 
     selectRecommendation(text, type) {
-        console.log('selectRecommendation called with:', text, type);
-        
         try {
             // Hide the recommendations dropdown first
             this.hideRecommendations();
@@ -863,16 +1065,16 @@ class VoiceTodoApp {
                 reminderTime: null
             };
             
-            console.log('Created todo:', todo);
-            
             // Add the todo directly to the array
             this.todos.push(todo);
-            console.log('Todos after push:', this.todos);
             
             // Save and render
             this.saveTodos();
             this.renderTodos();
             this.updateStats();
+            
+            // Check for timer/alarm keywords and create them
+            this.checkAndCreateTimerOrAlarm(text, todo.id);
             
             // Clear the input field
             document.getElementById('todoInput').value = '';
@@ -880,8 +1082,6 @@ class VoiceTodoApp {
             
             // Show success notifications
             this.showNotification(`Added: ${text}`, 'success');
-            
-            console.log('Task added successfully!');
             
         } catch (error) {
             console.error('Error adding task:', error);
@@ -893,6 +1093,952 @@ class VoiceTodoApp {
     testAddTask() {
         console.log('Test button clicked');
         this.selectRecommendation('Test Task', 'work');
+    }
+
+    // Test function for timer/alarm functionality
+    testTimerAlarm() {
+        console.log('🧪 Testing timer/alarm functionality...');
+        
+        // Test timer patterns
+        const testTexts = [
+            'Study for 30 minutes timer',
+            'Workout for 1 hour timer',
+            'Focus work for 2:30 timer',
+            'Alarm at 3:00 PM for meeting',
+            'Remind me at 14:30 to call mom'
+        ];
+        
+        testTexts.forEach((text, index) => {
+            console.log(`🧪 Test ${index + 1}: "${text}"`);
+            this.checkAndCreateTimerOrAlarm(text, Date.now() + index);
+        });
+    }
+
+    // Theme Management
+    setTheme(theme) {
+        this.currentTheme = theme;
+        localStorage.setItem('theme', theme);
+        document.body.className = `theme-${theme}`;
+        
+        // Update active theme option
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.classList.remove('active');
+        });
+        document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
+        
+        this.showNotification(`Theme changed to ${theme}`, 'success');
+    }
+
+
+    // Settings Modal
+    showSettings() {
+        document.getElementById('settingsModal').classList.add('show');
+    }
+
+    hideSettings() {
+        document.getElementById('settingsModal').classList.remove('show');
+    }
+
+    // Time Tracking
+    toggleTimeTracking(enabled) {
+        localStorage.setItem('timeTrackingEnabled', enabled);
+        this.showNotification(enabled ? 'Time tracking enabled' : 'Time tracking disabled', 'info');
+    }
+
+    toggleTimer(todoId) {
+        const todo = this.todos.find(t => t.id === todoId);
+        if (!todo) return;
+
+        if (this.activeTimers.has(todoId)) {
+            // Stop timer
+            this.stopTimer(todoId);
+        } else {
+            // Start timer
+            this.startTimer(todoId);
+        }
+    }
+
+    startTimer(todoId) {
+        const todo = this.todos.find(t => t.id === todoId);
+        if (!todo) return;
+
+        // Stop any other active timers
+        this.activeTimers.forEach((_, id) => {
+            if (id !== todoId) this.stopTimer(id);
+        });
+
+        const startTime = Date.now();
+        this.activeTimers.set(todoId, startTime);
+
+        // Update UI
+        const timerBtn = document.querySelector(`[data-todo-id="${todoId}"].timer`);
+        if (timerBtn) {
+            timerBtn.classList.add('running');
+            timerBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            timerBtn.title = 'Stop timer';
+        }
+
+        this.showNotification(`Timer started for: ${todo.text}`, 'success');
+    }
+
+    stopTimer(todoId) {
+        const todo = this.todos.find(t => t.id === todoId);
+        if (!todo) return;
+
+        const startTime = this.activeTimers.get(todoId);
+        if (!startTime) return;
+
+        const duration = Date.now() - startTime;
+        this.activeTimers.delete(todoId);
+
+        // Update time tracking data
+        if (!this.timeTracking[todoId]) {
+            this.timeTracking[todoId] = 0;
+        }
+        this.timeTracking[todoId] += duration;
+        localStorage.setItem('timeTracking', JSON.stringify(this.timeTracking));
+
+        // Update UI
+        const timerBtn = document.querySelector(`[data-todo-id="${todoId}"].timer`);
+        if (timerBtn) {
+            timerBtn.classList.remove('running');
+            timerBtn.innerHTML = '<i class="fas fa-play"></i>';
+            timerBtn.title = 'Start timer';
+        }
+
+        const minutes = Math.round(duration / 60000);
+        this.showNotification(`Timer stopped. Time spent: ${minutes} minutes`, 'success');
+    }
+
+    // Goals Management
+    toggleGoals(enabled) {
+        localStorage.setItem('goalsEnabled', enabled);
+        this.showNotification(enabled ? 'Goal tracking enabled' : 'Goal tracking disabled', 'info');
+    }
+
+    addGoal(goal) {
+        const newGoal = {
+            id: Date.now(),
+            text: goal,
+            completed: false,
+            createdAt: new Date().toISOString(),
+            targetDate: null
+        };
+        this.goals.push(newGoal);
+        this.saveGoals();
+        this.showNotification(`Goal added: ${goal}`, 'success');
+    }
+
+    saveGoals() {
+        localStorage.setItem('goals', JSON.stringify(this.goals));
+    }
+
+    // Initialize theme on load
+    initTheme() {
+        document.body.className = `theme-${this.currentTheme}`;
+        
+        // Set active theme option
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.classList.remove('active');
+        });
+        const activeOption = document.querySelector(`[data-theme="${this.currentTheme}"]`);
+        if (activeOption) {
+            activeOption.classList.add('active');
+        }
+    }
+
+    // Calendar Integration
+    toggleCalendarView() {
+        this.calendarViewVisible = !this.calendarViewVisible;
+        const calendarSection = document.getElementById('calendarSection');
+        
+        if (this.calendarViewVisible) {
+            calendarSection.style.display = 'block';
+            this.renderCalendar();
+            this.showNotification('Calendar view opened', 'info');
+        } else {
+            calendarSection.style.display = 'none';
+            this.showNotification('Calendar view closed', 'info');
+        }
+    }
+
+    renderCalendar() {
+        const calendarGrid = document.getElementById('calendarGrid');
+        const currentMonth = document.getElementById('currentMonth');
+        
+        const year = this.currentCalendarDate.getFullYear();
+        const month = this.currentCalendarDate.getMonth();
+        
+        currentMonth.textContent = this.currentCalendarDate.toLocaleDateString('en-US', { 
+            month: 'long', 
+            year: 'numeric' 
+        });
+
+        // Clear calendar
+        calendarGrid.innerHTML = '';
+
+        // Add day headers
+        const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        dayHeaders.forEach(day => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = day;
+            calendarGrid.appendChild(dayHeader);
+        });
+
+        // Get first day of month and number of days
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDay = firstDay.getDay();
+
+        // Add empty cells for days before month starts
+        for (let i = 0; i < startingDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day';
+            calendarGrid.appendChild(emptyDay);
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            dayElement.innerHTML = `
+                <div class="calendar-day-number">${day}</div>
+                <div class="calendar-day-tasks"></div>
+            `;
+
+            const currentDate = new Date(year, month, day);
+            const dateString = currentDate.toISOString().split('T')[0];
+            
+            // Check if this day has tasks
+            const dayTasks = this.todos.filter(todo => todo.date === dateString);
+            if (dayTasks.length > 0) {
+                dayElement.classList.add('has-tasks');
+                const tasksElement = dayElement.querySelector('.calendar-day-tasks');
+                tasksElement.textContent = `${dayTasks.length} task${dayTasks.length > 1 ? 's' : ''}`;
+            }
+
+            // Check if this is today
+            const today = new Date();
+            if (currentDate.toDateString() === today.toDateString()) {
+                dayElement.classList.add('today');
+            }
+
+            // Add click event to filter by date
+            dayElement.addEventListener('click', () => {
+                this.setDateFilter(dateString);
+                this.toggleCalendarView(); // Close calendar after selection
+            });
+
+            calendarGrid.appendChild(dayElement);
+        }
+    }
+
+    changeMonth(direction) {
+        this.currentCalendarDate.setMonth(this.currentCalendarDate.getMonth() + direction);
+        this.renderCalendar();
+    }
+
+    // Analytics Dashboard
+    showAnalytics() {
+        document.getElementById('analyticsSection').style.display = 'block';
+        this.updateAnalytics();
+        this.showNotification('Analytics dashboard opened', 'info');
+    }
+
+    hideAnalytics() {
+        document.getElementById('analyticsSection').style.display = 'none';
+        this.showNotification('Analytics dashboard closed', 'info');
+    }
+
+    toggleAnalytics(enabled) {
+        localStorage.setItem('analyticsEnabled', enabled);
+        this.showNotification(enabled ? 'Analytics enabled' : 'Analytics disabled', 'info');
+    }
+
+    updateAnalytics() {
+        const totalTasks = this.todos.length;
+        const completedTasks = this.todos.filter(todo => todo.completed).length;
+        const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+        // Update basic metrics
+        document.getElementById('totalTasksAnalytics').textContent = totalTasks;
+        document.getElementById('completionRate').textContent = `${completionRate}%`;
+
+        // Calculate time tracking metrics
+        const totalTimeMs = Object.values(this.timeTracking).reduce((sum, time) => sum + time, 0);
+        const totalHours = Math.round(totalTimeMs / (1000 * 60 * 60) * 10) / 10;
+        const avgTimePerTask = totalTasks > 0 ? Math.round(totalTimeMs / (1000 * 60) / totalTasks) : 0;
+
+        document.getElementById('totalTimeSpent').textContent = `${totalHours}h`;
+        document.getElementById('avgTimePerTask').textContent = `${avgTimePerTask}m`;
+
+        // Generate task type chart
+        this.generateTaskTypeChart();
+        
+        // Generate weekly progress chart
+        this.generateWeeklyChart();
+    }
+
+    generateTaskTypeChart() {
+        const typeCounts = {};
+        this.todos.forEach(todo => {
+            const type = todo.type || 'other';
+            typeCounts[type] = (typeCounts[type] || 0) + 1;
+        });
+
+        const chartContainer = document.getElementById('taskTypeChart');
+        chartContainer.innerHTML = '';
+
+        if (Object.keys(typeCounts).length === 0) {
+            chartContainer.innerHTML = '<div style="color: #b0b0b0;">No data available</div>';
+            return;
+        }
+
+        const maxCount = Math.max(...Object.values(typeCounts));
+        const chartBar = document.createElement('div');
+        chartBar.className = 'chart-bar';
+
+        Object.entries(typeCounts).forEach(([type, count]) => {
+            const height = (count / maxCount) * 100;
+            const barItem = document.createElement('div');
+            barItem.className = 'chart-bar-item';
+            barItem.style.height = `${height}%`;
+            barItem.title = `${type}: ${count} tasks`;
+            
+            const label = document.createElement('div');
+            label.className = 'chart-bar-label';
+            label.textContent = type;
+            barItem.appendChild(label);
+            
+            chartBar.appendChild(barItem);
+        });
+
+        chartContainer.appendChild(chartBar);
+    }
+
+    generateWeeklyChart() {
+        const weeklyData = this.getWeeklyData();
+        const chartContainer = document.getElementById('weeklyChart');
+        chartContainer.innerHTML = '';
+
+        if (weeklyData.length === 0) {
+            chartContainer.innerHTML = '<div style="color: #b0b0b0;">No data available</div>';
+            return;
+        }
+
+        const maxCount = Math.max(...weeklyData.map(day => day.completed));
+        const chartBar = document.createElement('div');
+        chartBar.className = 'chart-bar';
+
+        weeklyData.forEach(day => {
+            const height = maxCount > 0 ? (day.completed / maxCount) * 100 : 0;
+            const barItem = document.createElement('div');
+            barItem.className = 'chart-bar-item';
+            barItem.style.height = `${height}%`;
+            barItem.title = `${day.day}: ${day.completed} completed`;
+            
+            const label = document.createElement('div');
+            label.className = 'chart-bar-label';
+            label.textContent = day.day;
+            barItem.appendChild(label);
+            
+            chartBar.appendChild(barItem);
+        });
+
+        chartContainer.appendChild(chartBar);
+    }
+
+    getWeeklyData() {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const weeklyData = [];
+        
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateString = date.toISOString().split('T')[0];
+            
+            const dayTasks = this.todos.filter(todo => todo.date === dateString);
+            const completedTasks = dayTasks.filter(todo => todo.completed);
+            
+            weeklyData.push({
+                day: days[date.getDay()],
+                total: dayTasks.length,
+                completed: completedTasks.length
+            });
+        }
+        
+        return weeklyData;
+    }
+
+    // Habit Tracking
+    showHabits() {
+        document.getElementById('habitsSection').style.display = 'block';
+        this.renderHabits();
+        this.showNotification('Habit tracker opened', 'info');
+    }
+
+    hideHabits() {
+        document.getElementById('habitsSection').style.display = 'none';
+        this.showNotification('Habit tracker closed', 'info');
+    }
+
+    toggleHabits(enabled) {
+        localStorage.setItem('habitsEnabled', enabled);
+        this.showNotification(enabled ? 'Habit tracking enabled' : 'Habit tracking disabled', 'info');
+    }
+
+    showAddHabitModal() {
+        const title = prompt('Enter habit title:');
+        if (!title) return;
+        
+        const description = prompt('Enter habit description (optional):') || '';
+        
+        const newHabit = {
+            id: Date.now(),
+            title: title,
+            description: description,
+            createdAt: new Date().toISOString(),
+            completedDays: [],
+            streak: 0
+        };
+        
+        this.habits.push(newHabit);
+        this.saveHabits();
+        this.renderHabits();
+        this.showNotification(`Habit "${title}" added!`, 'success');
+    }
+
+    renderHabits() {
+        const habitsGrid = document.getElementById('habitsGrid');
+        habitsGrid.innerHTML = '';
+
+        if (this.habits.length === 0) {
+            habitsGrid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; color: #b0b0b0; padding: 40px;">
+                    <i class="fas fa-repeat" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                    <h3>No habits yet</h3>
+                    <p>Click "Add Habit" to start tracking your daily habits!</p>
+                </div>
+            `;
+            return;
+        }
+
+        this.habits.forEach(habit => {
+            const habitCard = document.createElement('div');
+            habitCard.className = 'habit-card';
+            
+            const today = new Date().toISOString().split('T')[0];
+            const isCompletedToday = habit.completedDays.includes(today);
+            const streak = this.calculateStreak(habit);
+            
+            habitCard.innerHTML = `
+                <div class="habit-header">
+                    <div class="habit-title">${habit.title}</div>
+                    <div class="habit-streak">${streak} day streak</div>
+                </div>
+                <div class="habit-description">${habit.description}</div>
+                <div class="habit-calendar">
+                    ${this.generateHabitCalendar(habit)}
+                </div>
+                <div class="habit-actions">
+                    <button class="habit-check-btn ${isCompletedToday ? 'checked' : ''}" 
+                            data-habit-id="${habit.id}">
+                        <i class="fas fa-${isCompletedToday ? 'check' : 'plus'}"></i>
+                        ${isCompletedToday ? 'Completed' : 'Mark Complete'}
+                    </button>
+                    <button class="habit-delete-btn" data-habit-id="${habit.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            habitsGrid.appendChild(habitCard);
+        });
+
+        // Add event listeners
+        habitsGrid.querySelectorAll('.habit-check-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const habitId = parseInt(e.currentTarget.getAttribute('data-habit-id'));
+                this.toggleHabitCompletion(habitId);
+            });
+        });
+
+        habitsGrid.querySelectorAll('.habit-delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const habitId = parseInt(e.currentTarget.getAttribute('data-habit-id'));
+                this.deleteHabit(habitId);
+            });
+        });
+    }
+
+    generateHabitCalendar(habit) {
+        const today = new Date();
+        const calendar = [];
+        
+        // Generate last 7 days
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateString = date.toISOString().split('T')[0];
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+            const isCompleted = habit.completedDays.includes(dateString);
+            const isToday = i === 0;
+            
+            calendar.push(`
+                <div class="habit-day ${isCompleted ? 'completed' : ''} ${isToday ? 'today' : ''}" 
+                     title="${dayName} ${dateString}">
+                    ${dayName[0]}
+                </div>
+            `);
+        }
+        
+        return calendar.join('');
+    }
+
+    calculateStreak(habit) {
+        const today = new Date();
+        let streak = 0;
+        
+        for (let i = 0; i < 365; i++) { // Check up to a year
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateString = date.toISOString().split('T')[0];
+            
+            if (habit.completedDays.includes(dateString)) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        
+        return streak;
+    }
+
+    toggleHabitCompletion(habitId) {
+        const habit = this.habits.find(h => h.id === habitId);
+        if (!habit) return;
+        
+        const today = new Date().toISOString().split('T')[0];
+        const isCompletedToday = habit.completedDays.includes(today);
+        
+        if (isCompletedToday) {
+            // Remove from completed days
+            habit.completedDays = habit.completedDays.filter(day => day !== today);
+            this.showNotification(`Habit "${habit.title}" unchecked`, 'info');
+        } else {
+            // Add to completed days
+            habit.completedDays.push(today);
+            this.showNotification(`Habit "${habit.title}" completed!`, 'success');
+        }
+        
+        this.saveHabits();
+        this.renderHabits();
+    }
+
+    deleteHabit(habitId) {
+        if (confirm('Are you sure you want to delete this habit?')) {
+            this.habits = this.habits.filter(h => h.id !== habitId);
+            this.saveHabits();
+            this.renderHabits();
+            this.showNotification('Habit deleted', 'info');
+        }
+    }
+
+    saveHabits() {
+        localStorage.setItem('habits', JSON.stringify(this.habits));
+    }
+
+    // Clock Timer and Alarm
+    initClock() {
+        this.updateCurrentTime();
+        setInterval(() => {
+            this.updateCurrentTime();
+            this.checkAlarms();
+        }, 1000);
+    }
+
+    updateCurrentTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        const dateString = now.toLocaleDateString('en-US', { 
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        const currentTimeEl = document.getElementById('currentTime');
+        const currentDateEl = document.getElementById('currentDate');
+        
+        if (currentTimeEl) currentTimeEl.textContent = timeString;
+        if (currentDateEl) currentDateEl.textContent = dateString;
+    }
+
+    showClock() {
+        document.getElementById('clockSection').style.display = 'block';
+        this.renderAlarms();
+        this.showNotification('Clock & Timer opened', 'info');
+    }
+
+    hideClock() {
+        document.getElementById('clockSection').style.display = 'none';
+        this.showNotification('Clock & Timer closed', 'info');
+    }
+
+    // Timer Functions
+    startTimer() {
+        if (this.timerInterval) return;
+
+        const hours = parseInt(document.getElementById('timerHours').value) || 0;
+        const minutes = parseInt(document.getElementById('timerMinutes').value) || 0;
+        const seconds = parseInt(document.getElementById('timerSeconds').value) || 0;
+
+        this.timerTime = hours * 3600 + minutes * 60 + seconds;
+        
+        if (this.timerTime <= 0) {
+            this.showNotification('Please set a valid timer duration', 'error');
+            return;
+        }
+
+        this.timerInterval = setInterval(() => {
+            this.timerTime--;
+            this.updateTimerDisplay();
+            
+            if (this.timerTime <= 0) {
+                this.timerFinished();
+            }
+        }, 1000);
+
+        this.updateTimerButtons('running');
+        this.showNotification('Timer started', 'success');
+    }
+
+    pauseTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+            this.updateTimerButtons('paused');
+            this.showNotification('Timer paused', 'info');
+        }
+    }
+
+    resetTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+        
+        this.timerTime = 0;
+        this.updateTimerDisplay();
+        this.updateTimerButtons('stopped');
+        this.showNotification('Timer reset', 'info');
+    }
+
+    timerFinished() {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+        this.updateTimerButtons('stopped');
+        this.showNotification('Timer finished!', 'success');
+        this.showBrowserNotification('Timer Finished', 'Your timer has completed!');
+        
+        // Play notification sound if available
+        this.playNotificationSound();
+    }
+
+    updateTimerDisplay() {
+        const hours = Math.floor(this.timerTime / 3600);
+        const minutes = Math.floor((this.timerTime % 3600) / 60);
+        const seconds = this.timerTime % 60;
+        
+        const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        document.getElementById('timerDisplay').textContent = timeString;
+    }
+
+    updateTimerButtons(state) {
+        const startBtn = document.getElementById('timerStart');
+        const pauseBtn = document.getElementById('timerPause');
+        const resetBtn = document.getElementById('timerReset');
+
+        if (state === 'running') {
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+        } else if (state === 'paused') {
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            resetBtn.disabled = false;
+        } else {
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            resetBtn.disabled = true;
+        }
+    }
+
+    // Stopwatch Functions
+    startStopwatch() {
+        if (this.stopwatchInterval) return;
+
+        this.stopwatchInterval = setInterval(() => {
+            this.stopwatchTime++;
+            this.updateStopwatchDisplay();
+        }, 100);
+
+        this.updateStopwatchButtons('running');
+        this.showNotification('Stopwatch started', 'success');
+    }
+
+    pauseStopwatch() {
+        if (this.stopwatchInterval) {
+            clearInterval(this.stopwatchInterval);
+            this.stopwatchInterval = null;
+            this.updateStopwatchButtons('paused');
+            this.showNotification('Stopwatch paused', 'info');
+        }
+    }
+
+    resetStopwatch() {
+        if (this.stopwatchInterval) {
+            clearInterval(this.stopwatchInterval);
+            this.stopwatchInterval = null;
+        }
+        
+        this.stopwatchTime = 0;
+        this.lapTimes = [];
+        this.updateStopwatchDisplay();
+        this.updateStopwatchButtons('stopped');
+        this.renderLapTimes();
+        this.showNotification('Stopwatch reset', 'info');
+    }
+
+    addLapTime() {
+        if (this.stopwatchTime > 0) {
+            const lapTime = this.stopwatchTime;
+            this.lapTimes.push({
+                lap: this.lapTimes.length + 1,
+                time: lapTime
+            });
+            this.renderLapTimes();
+            this.showNotification(`Lap ${this.lapTimes.length} recorded`, 'info');
+        }
+    }
+
+    updateStopwatchDisplay() {
+        const totalSeconds = Math.floor(this.stopwatchTime / 10);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const centiseconds = this.stopwatchTime % 10;
+        
+        const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds}`;
+        document.getElementById('stopwatchDisplay').textContent = timeString;
+    }
+
+    updateStopwatchButtons(state) {
+        const startBtn = document.getElementById('stopwatchStart');
+        const pauseBtn = document.getElementById('stopwatchPause');
+        const resetBtn = document.getElementById('stopwatchReset');
+        const lapBtn = document.getElementById('stopwatchLap');
+
+        if (state === 'running') {
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+            lapBtn.disabled = false;
+        } else if (state === 'paused') {
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            resetBtn.disabled = false;
+            lapBtn.disabled = false;
+        } else {
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            resetBtn.disabled = true;
+            lapBtn.disabled = true;
+        }
+    }
+
+    renderLapTimes() {
+        const lapTimesContainer = document.getElementById('lapTimes');
+        lapTimesContainer.innerHTML = '';
+
+        if (this.lapTimes.length === 0) {
+            lapTimesContainer.innerHTML = '<div style="text-align: center; color: #b0b0b0; padding: 20px;">No lap times recorded</div>';
+            return;
+        }
+
+        this.lapTimes.forEach(lap => {
+            const lapElement = document.createElement('div');
+            lapElement.className = 'lap-time';
+            
+            const totalSeconds = Math.floor(lap.time / 10);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const centiseconds = lap.time % 10;
+            
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds}`;
+            
+            lapElement.innerHTML = `
+                <span>Lap ${lap.lap}</span>
+                <span>${timeString}</span>
+            `;
+            
+            lapTimesContainer.appendChild(lapElement);
+        });
+    }
+
+    // Alarm Functions
+    showAddAlarmModal() {
+        const time = prompt('Enter alarm time (HH:MM):');
+        if (!time || !time.match(/^\d{2}:\d{2}$/)) {
+            this.showNotification('Invalid time format. Use HH:MM', 'error');
+            return;
+        }
+
+        const label = prompt('Enter alarm label (optional):') || 'Alarm';
+        
+        const newAlarm = {
+            id: Date.now(),
+            time: time,
+            label: label,
+            enabled: true,
+            createdAt: new Date().toISOString()
+        };
+        
+        this.alarms.push(newAlarm);
+        this.saveAlarms();
+        this.renderAlarms();
+        this.showNotification(`Alarm "${label}" added for ${time}`, 'success');
+    }
+
+    renderAlarms() {
+        const alarmsList = document.getElementById('alarmsList');
+        alarmsList.innerHTML = '';
+
+        if (this.alarms.length === 0) {
+            alarmsList.innerHTML = `
+                <div style="text-align: center; color: #b0b0b0; padding: 20px;">
+                    <i class="fas fa-bell" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.3;"></i>
+                    <p>No alarms set</p>
+                </div>
+            `;
+            return;
+        }
+
+        this.alarms.forEach(alarm => {
+            const alarmElement = document.createElement('div');
+            alarmElement.className = `alarm-item ${alarm.enabled ? 'active' : ''}`;
+            
+            alarmElement.innerHTML = `
+                <div class="alarm-info">
+                    <div class="alarm-time">${alarm.time}</div>
+                    <div class="alarm-label">${alarm.label}</div>
+                </div>
+                <div class="alarm-actions">
+                    <button class="alarm-toggle ${alarm.enabled ? '' : 'disabled'}" 
+                            data-alarm-id="${alarm.id}">
+                        ${alarm.enabled ? 'ON' : 'OFF'}
+                    </button>
+                    <button class="alarm-delete" data-alarm-id="${alarm.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            alarmsList.appendChild(alarmElement);
+        });
+
+        // Add event listeners
+        alarmsList.querySelectorAll('.alarm-toggle').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const alarmId = parseInt(e.currentTarget.getAttribute('data-alarm-id'));
+                this.toggleAlarm(alarmId);
+            });
+        });
+
+        alarmsList.querySelectorAll('.alarm-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const alarmId = parseInt(e.currentTarget.getAttribute('data-alarm-id'));
+                this.deleteAlarm(alarmId);
+            });
+        });
+    }
+
+    toggleAlarm(alarmId) {
+        const alarm = this.alarms.find(a => a.id === alarmId);
+        if (!alarm) return;
+
+        alarm.enabled = !alarm.enabled;
+        this.saveAlarms();
+        this.renderAlarms();
+        this.showNotification(`Alarm ${alarm.enabled ? 'enabled' : 'disabled'}`, 'info');
+    }
+
+    deleteAlarm(alarmId) {
+        if (confirm('Are you sure you want to delete this alarm?')) {
+            this.alarms = this.alarms.filter(a => a.id !== alarmId);
+            this.saveAlarms();
+            this.renderAlarms();
+            this.showNotification('Alarm deleted', 'info');
+        }
+    }
+
+    checkAlarms() {
+        const now = new Date();
+        const currentTime = now.toLocaleTimeString('en-US', { 
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        this.alarms.forEach(alarm => {
+            if (alarm.enabled && alarm.time === currentTime) {
+                this.triggerAlarm(alarm);
+            }
+        });
+    }
+
+    triggerAlarm(alarm) {
+        this.showNotification(`ALARM: ${alarm.label}`, 'success');
+        this.showBrowserNotification('Alarm', alarm.label);
+        this.playNotificationSound();
+        
+        // Disable alarm after triggering
+        alarm.enabled = false;
+        this.saveAlarms();
+        this.renderAlarms();
+    }
+
+    playNotificationSound() {
+        // Create a simple beep sound using Web Audio API
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (error) {
+            console.log('Could not play notification sound:', error);
+        }
+    }
+
+    saveAlarms() {
+        localStorage.setItem('alarms', JSON.stringify(this.alarms));
     }
 
     getRecurringTasks() {
@@ -950,6 +2096,147 @@ class VoiceTodoApp {
         }));
     }
 
+    // Generate AI suggestions (called after adding tasks)
+    generateAISuggestions() {
+        // This function is called after adding tasks to potentially update suggestions
+        // The actual suggestions are generated in handleInputChange when user types
+    }
+
+    // Check for timer/alarm keywords and create them automatically
+    checkAndCreateTimerOrAlarm(text, todoId) {
+        const lowerText = text.toLowerCase();
+        
+        // Timer patterns (duration-based) - Simplified and more flexible
+        const timerPatterns = [
+            { pattern: /(\d+)\s*min(?:ute|utes?)?\s*timer/i, type: 'minutes' },
+            { pattern: /(\d+)\s*hr(?:our|ours?)?\s*timer/i, type: 'hours' },
+            { pattern: /timer\s*(\d+)\s*min(?:ute|utes?)?/i, type: 'minutes' },
+            { pattern: /timer\s*(\d+)\s*hr(?:our|ours?)?/i, type: 'hours' },
+            { pattern: /(\d+):(\d+)\s*timer/i, type: 'time' },
+            { pattern: /(\d+)\s*min(?:ute|utes?)?\s*for/i, type: 'minutes' },
+            { pattern: /(\d+)\s*hr(?:our|ours?)?\s*for/i, type: 'hours' }
+        ];
+
+        // Alarm patterns (time-based) - Simplified
+        const alarmPatterns = [
+            { pattern: /alarm\s*(\d{1,2}):(\d{2})/i, type: 'time' },
+            { pattern: /remind\s*(\d{1,2}):(\d{2})/i, type: 'time' },
+            { pattern: /wake\s*(\d{1,2}):(\d{2})/i, type: 'time' },
+            { pattern: /at\s*(\d{1,2}):(\d{2})/i, type: 'time' }
+        ];
+
+        // Check for timer patterns
+        for (const timerPattern of timerPatterns) {
+            const match = lowerText.match(timerPattern.pattern);
+            if (match) {
+                this.createTimerFromTask(match, timerPattern.type, text, todoId);
+                return;
+            }
+        }
+
+        // Check for alarm patterns
+        for (const alarmPattern of alarmPatterns) {
+            const match = lowerText.match(alarmPattern.pattern);
+            if (match) {
+                this.createAlarmFromTask(match, text, todoId);
+                return;
+            }
+        }
+    }
+
+    // Create timer from task text
+    createTimerFromTask(match, type, originalText, todoId) {
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+
+        if (type === 'minutes') {
+            minutes = parseInt(match[1]);
+        } else if (type === 'hours') {
+            hours = parseInt(match[1]);
+        } else if (type === 'time') {
+            if (match[2]) {
+                hours = parseInt(match[1]);
+                minutes = parseInt(match[2]);
+            } else {
+                minutes = parseInt(match[1]);
+            }
+        }
+
+        // Set timer values in the UI
+        const timerHoursEl = document.getElementById('timerHours');
+        const timerMinutesEl = document.getElementById('timerMinutes');
+        const timerSecondsEl = document.getElementById('timerSeconds');
+        
+        if (timerHoursEl) timerHoursEl.value = hours;
+        if (timerMinutesEl) timerMinutesEl.value = minutes;
+        if (timerSecondsEl) timerSecondsEl.value = seconds;
+
+        // Create a timer entry for this task
+        const timerEntry = {
+            id: Date.now(),
+            todoId: todoId,
+            duration: hours * 3600 + minutes * 60 + seconds,
+            originalText: originalText,
+            createdAt: new Date().toISOString()
+        };
+
+        // Store timer info
+        if (!this.taskTimers) {
+            this.taskTimers = JSON.parse(localStorage.getItem('taskTimers')) || [];
+        }
+        this.taskTimers.push(timerEntry);
+        localStorage.setItem('taskTimers', JSON.stringify(this.taskTimers));
+
+        this.showNotification(`Timer set for ${hours}h ${minutes}m: ${originalText}`, 'success');
+        
+        // Auto-start timer if it's a reasonable duration (less than 4 hours)
+        if (hours < 4) {
+            setTimeout(() => {
+                this.startTimer();
+            }, 1000);
+        }
+    }
+
+    // Create alarm from task text
+    createAlarmFromTask(match, originalText, todoId) {
+        let hours = parseInt(match[1]);
+        let minutes = parseInt(match[2]);
+        const ampm = match[0].toLowerCase().includes('pm') ? 'pm' : 
+                    match[0].toLowerCase().includes('am') ? 'am' : null;
+
+        // Convert to 24-hour format if needed
+        if (ampm === 'pm' && hours !== 12) {
+            hours += 12;
+        } else if (ampm === 'am' && hours === 12) {
+            hours = 0;
+        }
+
+        // Format time as HH:MM
+        const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        
+        // Create alarm
+        const alarm = {
+            id: Date.now(),
+            time: timeString,
+            label: originalText,
+            enabled: true,
+            createdAt: new Date().toISOString(),
+            todoId: todoId
+        };
+        
+        this.alarms.push(alarm);
+        this.saveAlarms();
+        
+        // Update alarms display if clock section is visible
+        const clockSection = document.getElementById('clockSection');
+        if (clockSection && clockSection.style.display !== 'none') {
+            this.renderAlarms();
+        }
+
+        this.showNotification(`Alarm set for ${timeString}: ${originalText}`, 'success');
+    }
+
 
     // Notifications
     setupNotifications() {
@@ -1002,6 +2289,10 @@ class VoiceTodoApp {
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new VoiceTodoApp();
+    
+    // Make test functions available globally
+    window.testTimerAlarm = () => window.app.testTimerAlarm();
+    window.testAddTask = () => window.app.testAddTask();
 });
 
 // Add some CSS for task numbers

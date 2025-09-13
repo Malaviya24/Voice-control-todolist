@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Test</title>
+</head>
+<body>
+    <h1>Console Error Test</h1>
+    <p>Open the browser console (F12) and check for errors.</p>
+    
+    <script>
+        // Test if all required elements exist
+        function testElements() {
+            console.log('Testing DOM elements...');
+            
+            const elements = [
+                'voiceBtn',
+                'voiceStatus', 
+                'voiceIndicator',
+                'voiceVolume',
+                'voiceSpeed',
+                'voiceVolumeValue',
+                'voiceSpeedValue'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                console.log(`${id}: ${element ? '✅ Found' : '❌ Missing'}`);
+            });
+        }
+        
+        // Run test when page loads
+        window.addEventListener('load', testElements);
+    </script>
+</body>
+</html>

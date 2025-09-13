@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fixes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Console Error Fixes Test</h1>
+        
+        <!-- Voice Control Section -->
+        <section class="voice-section glass-card">
+            <div class="voice-controls">
+                <button id="voiceBtn" class="voice-btn">
+                    <i class="fas fa-microphone"></i>
+                    <span>Tap to speak</span>
+                </button>
+                <div id="voiceStatus" class="voice-status">Ready to listen</div>
+                <div id="voiceIndicator" class="voice-indicator"></div>
+            </div>
+        </section>
+
+        <!-- Input Section -->
+        <section class="input-section glass-card">
+            <div class="input-wrapper">
+                <input type="text" id="todoInput" class="todo-input" placeholder="Add a new task...">
+                <button id="addBtn" class="add-btn">
+                    <i class="fas fa-plus"></i>
+                    Add Task
+                </button>
+            </div>
+        </section>
+
+        <!-- Todo List -->
+        <section class="todo-section glass-card">
+            <div class="todo-list" id="todoList">
+                <!-- Tasks will appear here -->
+            </div>
+        </section>
+
+        <!-- Test Results -->
+        <section class="glass-card">
+            <h3>🧪 Test Results</h3>
+            <div id="testResults">
+                <p>Testing fixes...</p>
+            </div>
+            <button onclick="runTests()">Run Tests</button>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function runTests() {
+            const results = document.getElementById('testResults');
+            let html = '<h4>Test Results:</h4>';
+            
+            // Test 1: Check if app initialized
+            if (window.app) {
+                html += '<p>✅ App initialized successfully</p>';
+            } else {
+                html += '<p>❌ App failed to initialize</p>';
+            }
+            
+            // Test 2: Check voice elements
+            const voiceElements = ['voiceBtn', 'voiceStatus', 'voiceIndicator'];
+            let allVoiceElementsFound = true;
+            voiceElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    html += `<p>✅ ${id} found</p>`;
+                } else {
+                    html += `<p>❌ ${id} missing</p>`;
+                    allVoiceElementsFound = false;
+                }
+            });
+            
+            // Test 3: Test timer functionality
+            if (window.app) {
+                try {
+                    window.app.checkAndCreateTimerOrAlarm('30 min timer', Date.now());
+                    html += '<p>✅ Timer functionality works</p>';
+                } catch (error) {
+                    html += `<p>❌ Timer functionality error: ${error.message}</p>`;
+                }
+            }
+            
+            // Test 4: Check console for errors
+            html += '<p>📝 Check browser console (F12) for any remaining errors</p>';
+            
+            results.innerHTML = html;
+        }
+        
+        // Auto-run tests after page loads
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 2000);
+        });
+    </script>
+</body>
+</html>

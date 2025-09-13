@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Todo - Modern Productivity App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Voice Todo - Smart Task Management</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎤</text></svg>">
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <header class="header glass-card">
+        <header class="header">
             <div class="header-content">
                 <h1 class="app-title">
                     <i class="fas fa-microphone-alt"></i>
@@ -19,6 +20,9 @@
                 <p class="app-subtitle">Manage tasks with your voice</p>
             </div>
             <div class="header-controls">
+                <button id="themeToggle" class="theme-toggle" title="Toggle theme">
+                    <i class="fas fa-palette"></i>
+                </button>
                 <button id="settingsBtn" class="settings-btn" title="Settings">
                     <i class="fas fa-cog"></i>
                 </button>
@@ -27,14 +31,16 @@
 
         <main class="main-content">
             <!-- Voice Control Section -->
-            <section class="voice-section glass-card">
+            <section class="voice-section">
                 <div class="voice-controls">
                     <button id="voiceBtn" class="voice-btn">
                         <i class="fas fa-microphone"></i>
                         <span>Tap to speak</span>
                     </button>
-                    <div id="voiceStatus" class="voice-status">Ready to listen</div>
-                    <div id="voiceIndicator" class="voice-indicator"></div>
+                    <div class="voice-status">
+                        <div id="voiceStatus" class="status-text">Ready to listen</div>
+                        <div id="voiceIndicator" class="voice-indicator"></div>
+                    </div>
                     <div class="connection-status">
                         <div id="connectionStatus" class="status-badge">
                             <i class="fas fa-info-circle"></i>
@@ -42,17 +48,75 @@
                         </div>
                     </div>
                 </div>
+                <div class="voice-commands">
+                    <h3>Voice Commands</h3>
+                    <div class="commands-grid">
+                        <div class="command-item">
+                            <span class="command">"Add task"</span>
+                            <span class="description">Add a new todo</span>
+                        </div>
+                        <div class="command-item">
+                            <span class="command">"Complete task"</span>
+                            <span class="description">Mark as done</span>
+                        </div>
+                        <div class="command-item">
+                            <span class="command">"Delete task"</span>
+                            <span class="description">Remove todo</span>
+                        </div>
+                        <div class="command-item">
+                            <span class="command">"Clear all"</span>
+                            <span class="description">Delete all todos</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="voice-settings">
+                    <h3>Voice Settings</h3>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label for="voiceVolume">Volume</label>
+                            <input type="range" id="voiceVolume" min="0" max="1" step="0.1" value="0.8">
+                            <span class="setting-value">80%</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="voiceSpeed">Speed</label>
+                            <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1">
+                            <span class="setting-value">1x</span>
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <!-- Input Section -->
-            <section class="input-section glass-card">
-                <div class="input-wrapper">
+            <!-- Manual Input Section -->
+            <section class="input-section">
+                <div class="input-container">
                     <div class="input-group">
-                        <input type="text" id="todoInput" class="todo-input" placeholder="Add a new task...">
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="todoInput" 
+                                class="todo-input" 
+                                placeholder="Type a new task or use voice commands..."
+                                maxlength="100"
+                                autocomplete="off"
+                            >
+                            <!-- AI Recommendations Dropdown -->
+                            <div id="aiRecommendations" class="ai-recommendations">
+                                <div class="recommendations-header">
+                                    <i class="fas fa-robot"></i>
+                                    <span>AI Suggestions</span>
+                                    <small class="click-hint">Click to add</small>
+                                    <button onclick="window.app.testAddTask()" style="background: #00d4ff; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 10px;">Test</button>
+                                </div>
+                                <div id="recommendationsList" class="recommendations-list">
+                                    <!-- AI suggestions will appear here -->
+                                </div>
+                            </div>
+                        </div>
                         <div class="input-options">
-                            <input type="date" id="taskDate" class="date-input" title="Set due date">
-                            <select id="taskType" class="type-select">
-                                <option value="">Select type</option>
+                            <input type="date" id="taskDate" class="date-input" title="Select task date">
+                            <select id="taskType" class="type-select" title="Task category">
+                                <option value="">Auto-detect</option>
                                 <option value="work">Work</option>
                                 <option value="personal">Personal</option>
                                 <option value="study">Study</option>
@@ -62,76 +126,14 @@
                             </select>
                         </div>
                     </div>
-                    
-                    <!-- AI Recommendations -->
-                    <div class="ai-recommendations" id="aiRecommendations">
-                        <div class="recommendations-header">
-                            <span>AI Suggestions</span>
-                            <small class="click-hint">Click to add</small>
-                        </div>
-                        <div class="recommendations-list" id="recommendationsList">
-                            <!-- Recommendations will be generated here -->
-                        </div>
-                    </div>
-                    
                     <button id="addBtn" class="add-btn">
                         <i class="fas fa-plus"></i>
-                        Add Task
                     </button>
-                </div>
-            </section>
-
-            <!-- Filter Section -->
-            <section class="filter-section glass-card">
-                <div class="date-picker-container">
-                    <label for="dateFilter" class="date-label">
-                        <i class="fas fa-calendar-alt"></i>
-                        Select Date:
-                    </label>
-                    <input type="date" id="dateFilter" class="date-filter" title="Filter tasks by date">
-                    <button id="todayBtn" class="today-btn">Today</button>
-                    <button id="calendarViewBtn" class="calendar-view-btn">
-                        <i class="fas fa-calendar"></i>
-                        Calendar View
-                    </button>
-                </div>
-
-                <!-- Calendar View Section -->
-                <div id="calendarSection" class="calendar-section" style="display: none;">
-                    <div class="calendar-header">
-                        <button id="prevMonth" class="calendar-nav">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <h3 id="currentMonth"></h3>
-                        <button id="nextMonth" class="calendar-nav">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <div class="calendar-grid" id="calendarGrid">
-                        <!-- Calendar days will be generated here -->
-                    </div>
-                </div>
-                
-                <div class="todo-filters">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="active">Active</button>
-                    <button class="filter-btn" data-filter="completed">Completed</button>
-                    <div class="type-filters">
-                        <select id="typeFilter" class="type-filter">
-                            <option value="">All Types</option>
-                            <option value="work">Work</option>
-                            <option value="personal">Personal</option>
-                            <option value="study">Study</option>
-                            <option value="health">Health</option>
-                            <option value="shopping">Shopping</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
                 </div>
             </section>
 
             <!-- Analytics Dashboard Section -->
-            <section id="analyticsSection" class="analytics-section glass-card" style="display: none;">
+            <section id="analyticsSection" class="analytics-section" style="display: none;">
                 <div class="analytics-header">
                     <h2><i class="fas fa-chart-bar"></i> Analytics Dashboard</h2>
                     <button id="closeAnalytics" class="close-analytics">
@@ -177,7 +179,7 @@
             </section>
 
             <!-- Habit Tracking Section -->
-            <section id="habitsSection" class="habits-section glass-card" style="display: none;">
+            <section id="habitsSection" class="habits-section" style="display: none;">
                 <div class="habits-header">
                     <h2><i class="fas fa-repeat"></i> Habit Tracker</h2>
                     <div class="habits-controls">
@@ -196,7 +198,7 @@
             </section>
 
             <!-- Clock Timer and Alarm Section -->
-            <section id="clockSection" class="clock-section glass-card" style="display: none;">
+            <section id="clockSection" class="clock-section" style="display: none;">
                 <div class="clock-header">
                     <h2><i class="fas fa-clock"></i> Clock & Timer</h2>
                     <div class="clock-controls">
@@ -279,7 +281,7 @@
             </section>
 
             <!-- Todo List Section -->
-            <section class="todo-section glass-card">
+            <section class="todo-section">
                 <div class="todo-header">
                     <h2>Your Tasks</h2>
                     <div class="todo-stats">
@@ -297,11 +299,64 @@
                     </div>
                 </div>
                 
+                <div class="date-picker-container">
+                    <label for="dateFilter" class="date-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        Select Date:
+                    </label>
+                    <input type="date" id="dateFilter" class="date-filter" title="Filter tasks by date">
+                    <button id="todayBtn" class="today-btn">Today</button>
+                    <button id="calendarViewBtn" class="calendar-view-btn">
+                        <i class="fas fa-calendar"></i>
+                        Calendar View
+                    </button>
+                </div>
+
+                <!-- Calendar View Section -->
+                <div id="calendarSection" class="calendar-section" style="display: none;">
+                    <div class="calendar-header">
+                        <button id="prevMonth" class="calendar-nav">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h3 id="currentMonth"></h3>
+                        <button id="nextMonth" class="calendar-nav">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Calendar days will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="todo-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                    <div class="type-filters">
+                        <select id="typeFilter" class="type-filter">
+                            <option value="">All Types</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="study">Study</option>
+                            <option value="health">Health</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="todo-list" id="todoList">
-                    <!-- Todo items will be generated here -->
+                    <!-- Todos will be dynamically added here -->
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No tasks yet</h3>
+                    <p>Add your first task using voice commands or typing</p>
                 </div>
             </section>
         </main>
+
 
         <!-- Notification -->
         <div id="notification" class="notification">
@@ -383,18 +438,6 @@
                                 <input type="checkbox" id="enableHabits">
                                 Enable habit tracking
                             </label>
-                        </div>
-                    </div>
-                    
-                    <div class="settings-section">
-                        <h4><i class="fas fa-microphone"></i> Voice Settings</h4>
-                        <div class="setting-item">
-                            <label for="voiceVolume">Volume: <span id="voiceVolumeValue">80%</span></label>
-                            <input type="range" id="voiceVolume" min="0" max="1" step="0.1" value="0.8">
-                        </div>
-                        <div class="setting-item">
-                            <label for="voiceSpeed">Speed: <span id="voiceSpeedValue">1.0x</span></label>
-                            <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1.0">
                         </div>
                     </div>
                 </div>

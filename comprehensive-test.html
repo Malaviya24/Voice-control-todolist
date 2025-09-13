@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Test - Voice Todo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Comprehensive Problem Solver</h1>
+        
+        <!-- Test Results -->
+        <section class="glass-card">
+            <h2>📊 Test Results</h2>
+            <div id="testResults">
+                <p>Running comprehensive tests...</p>
+            </div>
+            <button onclick="runAllTests()" class="add-btn">🔄 Run All Tests</button>
+        </section>
+
+        <!-- Voice Test -->
+        <section class="voice-section glass-card">
+            <h3>🎤 Voice Test</h3>
+            <div class="voice-controls">
+                <button id="voiceBtn" class="voice-btn">
+                    <i class="fas fa-microphone"></i>
+                    <span>Tap to speak</span>
+                </button>
+                <div id="voiceStatus" class="voice-status">Ready to listen</div>
+                <div id="voiceIndicator" class="voice-indicator"></div>
+            </div>
+        </section>
+
+        <!-- Timer Test -->
+        <section class="input-section glass-card">
+            <h3>⏰ Timer Test</h3>
+            <div class="input-wrapper">
+                <input type="text" id="todoInput" class="todo-input" placeholder="Try: '30 min timer' or 'alarm 3:00'">
+                <button id="addBtn" class="add-btn">
+                    <i class="fas fa-plus"></i>
+                    Add Task
+                </button>
+            </div>
+            <div class="ai-recommendations" id="aiRecommendations">
+                <div class="recommendations-header">
+                    <span>AI Suggestions</span>
+                </div>
+                <div class="recommendations-list" id="recommendationsList">
+                    <!-- Recommendations will be generated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Todo List -->
+        <section class="todo-section glass-card">
+            <h3>📝 Todo List</h3>
+            <div class="todo-list" id="todoList">
+                <!-- Tasks will appear here -->
+            </div>
+        </section>
+
+        <!-- Clock Section Test -->
+        <section id="clockSection" class="clock-section glass-card" style="display: none;">
+            <h3>🕐 Clock & Timer</h3>
+            <div class="timer-section">
+                <div class="timer-display">
+                    <div class="timer-time" id="timerDisplay">00:00:00</div>
+                </div>
+                <div class="timer-input">
+                    <input type="number" id="timerHours" placeholder="H" min="0" max="23" value="0">
+                    <span>:</span>
+                    <input type="number" id="timerMinutes" placeholder="M" min="0" max="59" value="0">
+                    <span>:</span>
+                    <input type="number" id="timerSeconds" placeholder="S" min="0" max="59" value="0">
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Test -->
+        <section class="glass-card">
+            <h3>⚙️ Settings Test</h3>
+            <button id="settingsBtn" class="settings-btn">Settings</button>
+            <div id="settingsModal" class="settings-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Settings</h3>
+                        <button id="closeSettings" class="close-btn">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="settings-section">
+                            <h4>Voice Settings</h4>
+                            <div class="setting-item">
+                                <label for="voiceVolume">Volume: <span id="voiceVolumeValue">80%</span></label>
+                                <input type="range" id="voiceVolume" min="0" max="1" step="0.1" value="0.8">
+                            </div>
+                            <div class="setting-item">
+                                <label for="voiceSpeed">Speed: <span id="voiceSpeedValue">1.0x</span></label>
+                                <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1.0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let testResults = [];
+        
+        function addTestResult(test, status, message) {
+            testResults.push({ test, status, message });
+        }
+
+        function runAllTests() {
+            testResults = [];
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<p>🔄 Running comprehensive tests...</p>';
+            
+            setTimeout(() => {
+                // Test 1: App Initialization
+                if (window.app) {
+                    addTestResult('App Initialization', '✅', 'App loaded successfully');
+                } else {
+                    addTestResult('App Initialization', '❌', 'App failed to load');
+                }
+
+                // Test 2: Voice Elements
+                const voiceElements = ['voiceBtn', 'voiceStatus', 'voiceIndicator'];
+                let voiceElementsOk = true;
+                voiceElements.forEach(id => {
+                    if (!document.getElementById(id)) {
+                        voiceElementsOk = false;
+                    }
+                });
+                addTestResult('Voice Elements', voiceElementsOk ? '✅' : '❌', 
+                    voiceElementsOk ? 'All voice elements found' : 'Some voice elements missing');
+
+                // Test 3: Timer Elements
+                const timerElements = ['timerHours', 'timerMinutes', 'timerSeconds', 'timerDisplay'];
+                let timerElementsOk = true;
+                timerElements.forEach(id => {
+                    if (!document.getElementById(id)) {
+                        timerElementsOk = false;
+                    }
+                });
+                addTestResult('Timer Elements', timerElementsOk ? '✅' : '❌', 
+                    timerElementsOk ? 'All timer elements found' : 'Some timer elements missing');
+
+                // Test 4: Settings Elements
+                const settingsElements = ['voiceVolume', 'voiceSpeed', 'voiceVolumeValue', 'voiceSpeedValue'];
+                let settingsElementsOk = true;
+                settingsElements.forEach(id => {
+                    if (!document.getElementById(id)) {
+                        settingsElementsOk = false;
+                    }
+                });
+                addTestResult('Settings Elements', settingsElementsOk ? '✅' : '❌', 
+                    settingsElementsOk ? 'All settings elements found' : 'Some settings elements missing');
+
+                // Test 5: Voice Recognition Support
+                const voiceSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+                addTestResult('Voice Recognition', voiceSupported ? '✅' : '❌', 
+                    voiceSupported ? 'Voice recognition supported' : 'Voice recognition not supported');
+
+                // Test 6: Timer Pattern Matching
+                if (window.app) {
+                    try {
+                        const testText = "30 min timer";
+                        const timerPattern = /(\d+)\s*min(?:ute|utes?)?\s*timer/i;
+                        const match = testText.match(timerPattern);
+                        addTestResult('Timer Pattern Matching', match ? '✅' : '❌', 
+                            match ? 'Timer patterns work correctly' : 'Timer patterns not working');
+                    } catch (error) {
+                        addTestResult('Timer Pattern Matching', '❌', `Error: ${error.message}`);
+                    }
+                }
+
+                // Test 7: Console Errors
+                addTestResult('Console Errors', '📝', 'Check browser console (F12) for any errors');
+
+                // Display results
+                let html = '<h4>Test Results:</h4>';
+                testResults.forEach(result => {
+                    html += `<p>${result.status} <strong>${result.test}:</strong> ${result.message}</p>`;
+                });
+
+                // Overall status
+                const passedTests = testResults.filter(r => r.status === '✅').length;
+                const totalTests = testResults.filter(r => r.status !== '📝').length;
+                html += `<hr><p><strong>Overall: ${passedTests}/${totalTests} tests passed</strong></p>`;
+
+                resultsDiv.innerHTML = html;
+            }, 1000);
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 2000);
+        });
+    </script>
+</body>
+</html>

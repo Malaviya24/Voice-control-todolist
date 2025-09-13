@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        input { padding: 8px; margin: 5px; width: 300px; }
+        .result { margin: 10px 0; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Timer/Alarm Function Test</h1>
+    
+    <div class="test-section">
+        <h3>Manual Test</h3>
+        <input type="text" id="testInput" placeholder="Type: 30 min timer or alarm 3:00">
+        <button onclick="testInput()">Test Input</button>
+        <div id="result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Quick Tests</h3>
+        <button onclick="testPatterns()">Test All Patterns</button>
+        <button onclick="testSimple()">Test Simple</button>
+        <div id="patternResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Console Tests</h3>
+        <p>Open browser console (F12) and run:</p>
+        <code>testTimerAlarm()</code><br>
+        <code>testSimple()</code>
+    </div>
+
+    <script>
+        // Simplified timer/alarm detection function
+        function checkTimerAlarm(text) {
+            console.log('🔍 Testing:', text);
+            const lowerText = text.toLowerCase();
+            
+            // Simple timer patterns
+            const timerMatch = lowerText.match(/(\d+)\s*min(?:ute|utes?)?\s*timer/);
+            if (timerMatch) {
+                console.log('⏰ Timer found:', timerMatch[1], 'minutes');
+                return { type: 'timer', minutes: parseInt(timerMatch[1]) };
+            }
+            
+            const hourMatch = lowerText.match(/(\d+)\s*hr(?:our|ours?)?\s*timer/);
+            if (hourMatch) {
+                console.log('⏰ Timer found:', hourMatch[1], 'hours');
+                return { type: 'timer', hours: parseInt(hourMatch[1]) };
+            }
+            
+            // Simple alarm patterns
+            const alarmMatch = lowerText.match(/alarm\s*(\d{1,2}):(\d{2})/);
+            if (alarmMatch) {
+                console.log('🔔 Alarm found:', alarmMatch[1] + ':' + alarmMatch[2]);
+                return { type: 'alarm', time: alarmMatch[1] + ':' + alarmMatch[2] };
+            }
+            
+            console.log('❌ No match found');
+            return null;
+        }
+        
+        function testInput() {
+            const input = document.getElementById('testInput').value;
+            const result = checkTimerAlarm(input);
+            document.getElementById('result').innerHTML = 
+                `Input: "${input}"<br>Result: ${JSON.stringify(result)}`;
+        }
+        
+        function testPatterns() {
+            const tests = [
+                '30 min timer',
+                '1 hr timer', 
+                '2:30 timer',
+                'alarm 3:00',
+                'alarm 14:30',
+                'no match here'
+            ];
+            
+            let results = '<h4>Pattern Test Results:</h4>';
+            tests.forEach(test => {
+                const result = checkTimerAlarm(test);
+                results += `<div><strong>${test}</strong>: ${JSON.stringify(result)}</div>`;
+            });
+            
+            document.getElementById('patternResult').innerHTML = results;
+        }
+        
+        function testSimple() {
+            console.log('🧪 Simple test starting...');
+            const result = checkTimerAlarm('30 min timer');
+            console.log('Result:', result);
+            alert('Check console for results!');
+        }
+        
+        // Make functions available globally
+        window.testTimerAlarm = testPatterns;
+        window.testSimple = testSimple;
+    </script>
+</body>
+</html>
