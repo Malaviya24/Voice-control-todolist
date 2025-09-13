@@ -122,9 +122,9 @@ body {
 
 /* Glass Morphism Effect */
 .glass-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-xl);
     transition: all var(--transition-normal);
@@ -142,7 +142,7 @@ body {
     padding: var(--space-12) 0;
     position: relative;
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(8px);
     border-radius: var(--radius-2xl);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: var(--shadow-lg);
@@ -158,8 +158,8 @@ body {
 }
 
 .settings-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-full);
     width: 44px;
     height: 44px;
@@ -218,11 +218,11 @@ body {
 
 /* Voice Control Section */
 .voice-section {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: var(--shadow-lg);
     transition: all var(--transition-normal);
 }
@@ -335,7 +335,7 @@ body {
 }
 
 .todo-input, .date-input, .type-select {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
@@ -392,7 +392,7 @@ body {
 }
 
 .filter-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-full);
     padding: var(--space-3) var(--space-6);
@@ -436,7 +436,7 @@ body {
 }
 
 .date-filter, .type-filter {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-lg);
     padding: var(--space-3);
@@ -454,7 +454,7 @@ body {
 }
 
 .today-btn, .calendar-view-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-lg);
     padding: var(--space-3) var(--space-4);
@@ -476,11 +476,11 @@ body {
 
 /* Todo List Section */
 .todo-section {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: var(--shadow-lg);
 }
 
@@ -516,8 +516,8 @@ body {
 }
 
 .todo-item {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
     display: flex;
@@ -591,8 +591,8 @@ body {
 }
 
 .todo-type {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-full);
     padding: var(--space-1) var(--space-3);
     font-size: var(--text-xs);
@@ -614,8 +614,8 @@ body {
 }
 
 .todo-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-md);
     padding: var(--space-2);
     color: rgba(255, 255, 255, 0.8);
@@ -672,8 +672,8 @@ body {
 }
 
 .recommendations-list {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-lg);
     max-height: 200px;
     overflow-y: auto;
@@ -721,9 +721,9 @@ body {
     position: fixed;
     top: var(--space-6);
     right: var(--space-6);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
     color: white;
@@ -764,9 +764,9 @@ body {
 }
 
 .toast {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
     color: white;
@@ -1321,9 +1321,9 @@ body {
 }
 
 .modal-content {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
     max-width: 500px;
@@ -1358,8 +1358,8 @@ body {
 }
 
 .close-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-full);
     width: 40px;
     height: 40px;
@@ -1407,7 +1407,7 @@ body {
 }
 
 .theme-option {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
@@ -1481,7 +1481,7 @@ body {
 .setting-item input[type="checkbox"] {
     width: 20px;
     height: 20px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -1511,7 +1511,7 @@ body {
     width: 100%;
     height: 6px;
     border-radius: 3px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     outline: none;
     -webkit-appearance: none;
     appearance: none;
@@ -1540,11 +1540,11 @@ body {
 
 /* Analytics Section */
 .analytics-section {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: var(--shadow-lg);
     margin-bottom: var(--space-8);
 }
@@ -1568,8 +1568,8 @@ body {
 }
 
 .close-analytics {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-full);
     width: 40px;
     height: 40px;
@@ -1673,11 +1673,11 @@ body {
 
 /* Habits Section */
 .habits-section {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: var(--shadow-lg);
     margin-bottom: var(--space-8);
 }
@@ -1707,8 +1707,8 @@ body {
 }
 
 .add-habit-btn, .close-habits {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-lg);
     padding: var(--space-3) var(--space-4);
     color: rgba(255, 255, 255, 0.9);
@@ -1793,8 +1793,8 @@ body {
     width: 30px;
     height: 30px;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1872,11 +1872,11 @@ body {
 
 /* Clock Section */
 .clock-section {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: var(--shadow-lg);
     margin-bottom: var(--space-8);
 }
@@ -1906,8 +1906,8 @@ body {
 }
 
 .add-alarm-btn, .close-clock {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-lg);
     padding: var(--space-3) var(--space-4);
     color: rgba(255, 255, 255, 0.9);
@@ -2001,8 +2001,8 @@ body {
 }
 
 .timer-btn, .stopwatch-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-full);
     width: 50px;
     height: 50px;
@@ -2057,8 +2057,8 @@ body {
 }
 
 .timer-input input {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-md);
     padding: var(--space-2);
     color: white;
@@ -2222,8 +2222,8 @@ body {
 }
 
 .calendar-nav {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-full);
     width: 40px;
     height: 40px;
@@ -2271,7 +2271,7 @@ body {
 }
 
 .calendar-day:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     transform: translateY(-1px);
 }
 
@@ -2317,8 +2317,8 @@ body {
 }
 
 .status-badge {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-full);
     padding: var(--space-2) var(--space-4);
     color: rgba(255, 255, 255, 0.8);
@@ -2342,7 +2342,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-full);
 }
 

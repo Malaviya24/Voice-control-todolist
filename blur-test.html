@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blur Test - Voice Todo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header glass-card">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <i class="fas fa-microphone-alt"></i>
+                    Voice Todo
+                </h1>
+                <p class="app-subtitle">Manage tasks with your voice</p>
+            </div>
+            <div class="header-controls">
+                <button id="settingsBtn" class="settings-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Voice Control Section -->
+            <section class="voice-section glass-card">
+                <div class="voice-controls">
+                    <button id="voiceBtn" class="voice-btn">
+                        <i class="fas fa-microphone"></i>
+                        <span>Tap to speak</span>
+                    </button>
+                    <div id="voiceStatus" class="voice-status">Ready to listen</div>
+                    <div id="voiceIndicator" class="voice-indicator"></div>
+                </div>
+            </section>
+
+            <!-- Input Section -->
+            <section class="input-section glass-card">
+                <div class="input-wrapper">
+                    <div class="input-group">
+                        <input type="text" id="todoInput" class="todo-input" placeholder="Add a new task...">
+                        <div class="input-options">
+                            <input type="date" id="taskDate" class="date-input" title="Set due date">
+                            <select id="taskType" class="type-select">
+                                <option value="">Select type</option>
+                                <option value="work">Work</option>
+                                <option value="personal">Personal</option>
+                                <option value="study">Study</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="addBtn" class="add-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Task
+                    </button>
+                </div>
+            </section>
+
+            <!-- Todo List -->
+            <section class="todo-section glass-card">
+                <div class="todo-header">
+                    <h2>Your Tasks</h2>
+                    <div class="todo-stats">
+                        <span id="totalTasks">0</span> total
+                        <span id="completedTasks">0</span> completed
+                    </div>
+                </div>
+                <div class="todo-list" id="todoList">
+                    <div class="todo-item">
+                        <div class="todo-checkbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="todo-content">
+                            <div class="todo-text">Sample task for testing blur effects</div>
+                            <div class="todo-meta">
+                                <span class="todo-type work">work</span>
+                                <span class="todo-date">Dec 15</span>
+                            </div>
+                        </div>
+                        <div class="todo-actions">
+                            <button class="todo-btn timer" title="Start timer">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="todo-btn delete" title="Delete task">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Test Results -->
+            <section class="glass-card">
+                <h3>🔍 Blur Test Results</h3>
+                <div id="testResults">
+                    <p>✅ Blur effects reduced from 20px to 8px</p>
+                    <p>✅ Background opacity increased for better readability</p>
+                    <p>✅ Text should now be much clearer and easier to read</p>
+                    <p>✅ Glass morphism effect maintained but more subtle</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Test blur fixes
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 Blur test page loaded');
+            console.log('✅ Blur effects have been optimized for better readability');
+        });
+    </script>
+</body>
+</html>
