@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Test - Voice Todo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .device-frame {
+            max-width: 375px;
+            margin: 20px auto;
+            border: 8px solid #333;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        .device-header {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+        }
+        
+        .responsive-test {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .test-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>📱 Mobile Responsive Test</h1>
+        <p>This page shows how the Voice Todo app looks on different screen sizes</p>
+        <p><strong>Current viewport:</strong> <span id="viewportInfo"></span></p>
+    </div>
+
+    <div class="responsive-test">
+        <!-- Mobile Frame -->
+        <div class="device-frame">
+            <div class="device-header">📱 Mobile (375px)</div>
+            <div style="width: 375px; height: 667px; overflow-y: auto;">
+                <div class="container">
+                    <header class="header glass-card">
+                        <div class="header-content">
+                            <h1 class="app-title">
+                                <i class="fas fa-microphone-alt"></i>
+                                Voice Todo
+                            </h1>
+                            <p class="app-subtitle">Manage tasks with your voice</p>
+                        </div>
+                        <div class="header-controls">
+                            <button id="settingsBtn" class="settings-btn" title="Settings">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </header>
+
+                    <main class="main-content">
+                        <!-- Voice Control Section -->
+                        <section class="voice-section glass-card">
+                            <div class="voice-controls">
+                                <button id="voiceBtn" class="voice-btn">
+                                    <i class="fas fa-microphone"></i>
+                                    <span>Tap to speak</span>
+                                </button>
+                                <div id="voiceStatus" class="voice-status">Ready to listen</div>
+                                <div id="voiceIndicator" class="voice-indicator"></div>
+                            </div>
+                        </section>
+
+                        <!-- Input Section -->
+                        <section class="input-section glass-card">
+                            <div class="input-wrapper">
+                                <div class="input-group">
+                                    <input type="text" id="todoInput" class="todo-input" placeholder="Add a new task...">
+                                    <div class="input-options">
+                                        <input type="date" id="taskDate" class="date-input" title="Set due date">
+                                        <select id="taskType" class="type-select">
+                                            <option value="">Select type</option>
+                                            <option value="work">Work</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="study">Study</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button id="addBtn" class="add-btn">
+                                    <i class="fas fa-plus"></i>
+                                    Add Task
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Filter Section -->
+                        <section class="filter-section glass-card">
+                            <div class="todo-filters">
+                                <button class="filter-btn active" data-filter="all">All</button>
+                                <button class="filter-btn" data-filter="active">Active</button>
+                                <button class="filter-btn" data-filter="completed">Completed</button>
+                            </div>
+                        </section>
+
+                        <!-- Todo List -->
+                        <section class="todo-section glass-card">
+                            <div class="todo-header">
+                                <h2>Your Tasks</h2>
+                                <div class="todo-stats">
+                                    <span id="totalTasks">0</span> total
+                                    <span id="completedTasks">0</span> completed
+                                </div>
+                            </div>
+                            <div class="todo-list" id="todoList">
+                                <div class="todo-item">
+                                    <div class="todo-checkbox">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="todo-content">
+                                        <div class="todo-text">Sample task for testing</div>
+                                        <div class="todo-meta">
+                                            <span class="todo-type work">work</span>
+                                            <span class="todo-date">Dec 15</span>
+                                        </div>
+                                    </div>
+                                    <div class="todo-actions">
+                                        <button class="todo-btn timer" title="Start timer">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <button class="todo-btn delete" title="Delete task">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tablet Frame -->
+        <div class="device-frame" style="max-width: 768px;">
+            <div class="device-header">📱 Tablet (768px)</div>
+            <div style="width: 768px; height: 1024px; overflow-y: auto;">
+                <div class="container">
+                    <header class="header glass-card">
+                        <div class="header-content">
+                            <h1 class="app-title">
+                                <i class="fas fa-microphone-alt"></i>
+                                Voice Todo
+                            </h1>
+                            <p class="app-subtitle">Manage tasks with your voice</p>
+                        </div>
+                        <div class="header-controls">
+                            <button id="settingsBtn2" class="settings-btn" title="Settings">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </header>
+
+                    <main class="main-content">
+                        <!-- Voice Control Section -->
+                        <section class="voice-section glass-card">
+                            <div class="voice-controls">
+                                <button id="voiceBtn2" class="voice-btn">
+                                    <i class="fas fa-microphone"></i>
+                                    <span>Tap to speak</span>
+                                </button>
+                                <div id="voiceStatus2" class="voice-status">Ready to listen</div>
+                                <div id="voiceIndicator2" class="voice-indicator"></div>
+                            </div>
+                        </section>
+
+                        <!-- Input Section -->
+                        <section class="input-section glass-card">
+                            <div class="input-wrapper">
+                                <div class="input-group">
+                                    <input type="text" id="todoInput2" class="todo-input" placeholder="Add a new task...">
+                                    <div class="input-options">
+                                        <input type="date" id="taskDate2" class="date-input" title="Set due date">
+                                        <select id="taskType2" class="type-select">
+                                            <option value="">Select type</option>
+                                            <option value="work">Work</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="study">Study</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button id="addBtn2" class="add-btn">
+                                    <i class="fas fa-plus"></i>
+                                    Add Task
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Filter Section -->
+                        <section class="filter-section glass-card">
+                            <div class="todo-filters">
+                                <button class="filter-btn active" data-filter="all">All</button>
+                                <button class="filter-btn" data-filter="active">Active</button>
+                                <button class="filter-btn" data-filter="completed">Completed</button>
+                            </div>
+                        </section>
+
+                        <!-- Todo List -->
+                        <section class="todo-section glass-card">
+                            <div class="todo-header">
+                                <h2>Your Tasks</h2>
+                                <div class="todo-stats">
+                                    <span id="totalTasks2">0</span> total
+                                    <span id="completedTasks2">0</span> completed
+                                </div>
+                            </div>
+                            <div class="todo-list" id="todoList2">
+                                <div class="todo-item">
+                                    <div class="todo-checkbox">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="todo-content">
+                                        <div class="todo-text">Sample task for testing</div>
+                                        <div class="todo-meta">
+                                            <span class="todo-type work">work</span>
+                                            <span class="todo-date">Dec 15</span>
+                                        </div>
+                                    </div>
+                                    <div class="todo-actions">
+                                        <button class="todo-btn timer" title="Start timer">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <button class="todo-btn delete" title="Delete task">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update viewport info
+        function updateViewportInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            document.getElementById('viewportInfo').textContent = `${width}x${height}`;
+        }
+
+        // Update on load and resize
+        window.addEventListener('load', updateViewportInfo);
+        window.addEventListener('resize', updateViewportInfo);
+
+        // Add some sample data
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add sample tasks
+            const sampleTasks = [
+                { text: "Complete project report", type: "work" },
+                { text: "Buy groceries", type: "personal" },
+                { text: "Study for exam", type: "study" }
+            ];
+
+            // This is just for visual testing - no actual functionality
+            console.log('Mobile test page loaded');
+        });
+    </script>
+</body>
+</html>

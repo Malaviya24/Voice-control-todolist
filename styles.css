@@ -856,81 +856,413 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .container {
         padding: var(--space-4);
-        gap: var(--space-6);
+        gap: var(--space-4);
+    }
+    
+    .glass-card {
+        padding: var(--space-4);
+    }
+    
+    .analytics-grid, .habits-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-3);
+        gap: var(--space-3);
     }
     
     .header {
-        padding: var(--space-8) 0;
+        padding: var(--space-6) 0;
+    }
+    
+    .header-content {
+        text-align: center;
     }
     
     .app-title {
-        font-size: var(--text-4xl);
+        font-size: var(--text-3xl);
         flex-direction: column;
         gap: var(--space-2);
     }
     
     .app-title i {
-        font-size: var(--text-3xl);
+        font-size: var(--text-2xl);
     }
     
-    .voice-section, .todo-section {
-        padding: var(--space-6);
+    .app-subtitle {
+        font-size: var(--text-sm);
+    }
+    
+    .header-controls {
+        justify-content: center;
+        margin-top: var(--space-4);
+    }
+    
+    .voice-section, .todo-section, .input-section, .filter-section {
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+    
+    .voice-controls {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .voice-btn {
+        width: 70px;
+        height: 70px;
+        font-size: var(--text-xl);
+    }
+    
+    .voice-btn span {
+        font-size: var(--text-xs);
+    }
+    
+    .input-wrapper {
+        gap: var(--space-3);
+    }
+    
+    .input-group {
+        flex-direction: column;
+        gap: var(--space-3);
     }
     
     .input-options {
         grid-template-columns: 1fr;
+        gap: var(--space-2);
+    }
+    
+    .todo-input {
+        font-size: var(--text-base);
+        padding: var(--space-3);
+    }
+    
+    .add-btn {
+        padding: var(--space-3) var(--space-4);
+        font-size: var(--text-sm);
+    }
+    
+    .filter-section {
+        padding: var(--space-4);
+    }
+    
+    .date-picker-container {
+        flex-direction: column;
+        gap: var(--space-3);
+        align-items: stretch;
+    }
+    
+    .date-picker-container > * {
+        width: 100%;
     }
     
     .todo-filters {
         flex-direction: column;
-        align-items: center;
+        gap: var(--space-3);
+        align-items: stretch;
     }
     
-    .date-picker-container, .type-filters {
-        flex-direction: column;
-        align-items: center;
+    .filter-btn {
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--text-sm);
+    }
+    
+    .type-filters {
+        width: 100%;
+    }
+    
+    .type-filter {
+        width: 100%;
+        padding: var(--space-2);
     }
     
     .todo-header {
         flex-direction: column;
-        gap: var(--space-4);
+        gap: var(--space-3);
         align-items: center;
+        text-align: center;
     }
     
     .todo-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        justify-content: center;
+    }
+    
+    .todo-item {
+        padding: var(--space-3);
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .todo-content {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .todo-actions {
+        flex-direction: row;
+        justify-content: center;
+        gap: var(--space-2);
+    }
+    
+    .todo-btn {
+        padding: var(--space-2);
+        min-width: 40px;
+    }
+    
+    .ai-recommendations {
+        position: static;
+        margin-top: var(--space-3);
+        box-shadow: none;
+        border-radius: var(--radius-lg);
+    }
+    
+    .recommendations-list {
+        max-height: 200px;
+    }
+    
+    .recommendation-item {
+        padding: var(--space-2);
+        font-size: var(--text-sm);
+    }
+    
+    .notification, .toast {
+        max-width: calc(100vw - var(--space-8));
+        left: var(--space-4);
+        right: var(--space-4);
+        transform: translateX(0);
+    }
+    
+    .settings-modal .modal-content {
+        width: 95%;
+        max-width: 500px;
+        margin: var(--space-4);
+    }
+    
+    .modal-body {
+        padding: var(--space-4);
+    }
+    
+    .settings-section {
+        margin-bottom: var(--space-4);
+    }
+    
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+    
+    .setting-item label {
+        font-size: var(--text-sm);
+    }
+    
+    .analytics-grid, .habits-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+    
+    .analytics-card, .habit-card {
+        padding: var(--space-3);
+    }
+    
+    .clock-content {
+        padding: var(--space-3);
+    }
+    
+    .timer-section, .stopwatch-section, .alarms-section {
+        margin-bottom: var(--space-4);
+    }
+    
+    .timer-display, .stopwatch-display {
+        font-size: var(--text-2xl);
+    }
+    
+    .timer-input {
         flex-direction: column;
         gap: var(--space-2);
     }
     
-    .notification, .toast {
-        max-width: calc(100vw - var(--space-12));
+    .timer-input input {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .timer-controls, .stopwatch-controls {
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+    
+    .timer-btn, .stopwatch-btn {
+        flex: 1;
+        min-width: 60px;
     }
 }
 
 @media (max-width: 480px) {
     .container {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
+    
+    .glass-card {
         padding: var(--space-3);
+        margin-bottom: var(--space-2);
+    }
+    
+    .header {
+        padding: var(--space-4) 0;
     }
     
     .app-title {
-        font-size: var(--text-3xl);
+        font-size: var(--text-2xl);
+    }
+    
+    .app-subtitle {
+        font-size: var(--text-xs);
     }
     
     .voice-btn {
         width: 60px;
         height: 60px;
-        font-size: var(--text-xl);
+        font-size: var(--text-lg);
+    }
+    
+    .voice-btn span {
+        font-size: 10px;
+    }
+    
+    .voice-status {
+        font-size: var(--text-sm);
+    }
+    
+    .todo-input {
+        font-size: var(--text-sm);
+        padding: var(--space-2);
+    }
+    
+    .add-btn {
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--text-xs);
+    }
+    
+    .filter-btn {
+        padding: var(--space-1) var(--space-2);
+        font-size: var(--text-xs);
     }
     
     .todo-item {
-        padding: var(--space-3);
+        padding: var(--space-2);
     }
     
-    .todo-actions {
-        flex-direction: column;
+    .todo-text {
+        font-size: var(--text-sm);
+    }
+    
+    .todo-meta {
+        font-size: var(--text-xs);
+    }
+    
+    .todo-btn {
+        padding: var(--space-1);
+        min-width: 35px;
+        font-size: var(--text-xs);
+    }
+    
+    .notification, .toast {
+        font-size: var(--text-sm);
+        padding: var(--space-2);
+    }
+    
+    .settings-modal .modal-content {
+        width: 98%;
+        margin: var(--space-2);
+    }
+    
+    .modal-header h3 {
+        font-size: var(--text-lg);
+    }
+    
+    .setting-item label {
+        font-size: var(--text-xs);
+    }
+    
+    .timer-display, .stopwatch-display {
+        font-size: var(--text-xl);
+    }
+    
+    .timer-btn, .stopwatch-btn {
+        padding: var(--space-1);
+        font-size: var(--text-xs);
+    }
+    
+    .calendar-grid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+    }
+    
+    .calendar-day {
+        padding: var(--space-1);
+        font-size: var(--text-xs);
+    }
+}
+
+/* Landscape orientation fixes for mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .voice-controls {
+        flex-direction: row;
+        justify-content: center;
+    }
+    
+    .input-group {
+        flex-direction: row;
+    }
+    
+    .input-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .todo-filters {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 320px) {
+    .container {
+        padding: var(--space-1);
+    }
+    
+    .glass-card {
+        padding: var(--space-2);
+    }
+    
+    .app-title {
+        font-size: var(--text-xl);
+    }
+    
+    .voice-btn {
+        width: 50px;
+        height: 50px;
+        font-size: var(--text-base);
+    }
+    
+    .todo-input {
+        font-size: var(--text-xs);
+    }
+    
+    .add-btn {
+        padding: var(--space-1) var(--space-2);
+        font-size: 10px;
     }
 }
 
